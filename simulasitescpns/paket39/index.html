@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi CAT CPNS Resmi - 100 Menit (Lengkap Opsi A-E)</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-slate-100 font-sans">
+
+    <!-- HALAMAN LOGIN / REGISTRASI PESERTA -->
+    <div id="halaman-login" class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
+            <h2 class="text-2xl font-bold text-blue-900 mb-2 text-center">Simulasi CAT SKD CPNS</h2>
+            <p class="text-gray-500 text-sm mb-6 text-center">Silakan masukkan data diri untuk memulai ujian (Durasi: 100 Menit)</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Lengkap</label>
+                    <input type="text" id="input-nama" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="Contoh: Febri Delise">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Nomor Peserta</label>
+                    <input type="text" id="input-nomor" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="Contoh: 610012345678">
+                </div>
+                <button onclick="mulaiUjianApp()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition shadow">
+                    Mulai Ujian
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HALAMAN UTAMA UJIAN -->
+    <div id="halaman-ujian" class="hidden">
+        <header class="bg-blue-900 text-white p-4 shadow-md flex justify-between items-center">
+            <div>
+                <h1 class="text-lg font-bold">CAT BKN - Seleksi Kompetensi Dasar (SKD)</h1>
+                <p id="info-peserta" class="text-xs text-blue-200"></p>
+            </div>
+            <div id="timer" class="bg-red-600 px-4 py-2 rounded-lg font-mono font-bold text-lg shadow-inner">
+                01:40:00
+            </div>
+        </header>
+
+        <main class="max-w-6xl mx-auto p-4 grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+            <!-- Bagian Soal (Kiri) -->
+            <div class="md:col-span-3 bg-white p-6 rounded-xl shadow-md flex flex-col justify-between min-h-[450px]">
+                <div>
+                    <div class="flex justify-between items-center border-b pb-3 mb-4">
+                        <span id="nomor-soal" class="font-bold text-lg text-blue-900">Soal No. 1</span>
+                        <span id="kategori-soal" class="text-sm bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full font-semibold">TWK / TIU / TKP</span>
+                    </div>
+                    <p id="teks-soal" class="text-gray-800 text-lg mb-6 leading-relaxed">
+                        Pertanyaan soal di sini...
+                    </p>
+
+                    <!-- Pilihan Jawaban -->
+                    <div id="options-container" class="space-y-3">
+                        <!-- Opsi digenerate via JS -->
+                    </div>
+                </div>
+
+                <!-- Tombol Navigasi Bawah Soal -->
+                <div class="flex justify-between mt-8 pt-4 border-t">
+                    <button onclick="prevSoal()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-5 py-2 rounded-lg font-semibold transition">Sebelumnya</button>
+                    <button onclick="nextSoal()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition">Selanjutnya</button>
+                </div>
+            </div>
+
+            <!-- Navigasi Nomor Soal (Kanan) -->
+            <div class="bg-white p-4 rounded-xl shadow-md h-fit max-h-[500px] flex flex-col">
+                <h3 class="font-bold text-gray-700 mb-3 border-b pb-2">Navigasi Soal</h3>
+                <div id="nav-grid" class="grid grid-cols-5 gap-2 mb-6 overflow-y-auto p-1 max-h-[320px]">
+                    <!-- Tombol nomor soal -->
+                </div>
+                <div class="text-xs space-y-1 mb-4 text-gray-600 border-t pt-2">
+                    <div class="flex items-center gap-2"><span class="w-3 h-3 bg-blue-600 inline-block rounded"></span> Sudah dijawab</div>
+                    <div class="flex items-center gap-2"><span class="w-3 h-3 bg-gray-200 border inline-block rounded"></span> Belum dijawab</div>
+                </div>
+                <button onclick="konfirmasiSelesai()" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-bold shadow transition">
+                    Selesai Ujian
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- HALAMAN HASIL UJIAN -->
+    <div id="halaman-hasil" class="hidden flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-lg text-center">
+            <h2 class="text-2xl font-bold text-blue-900 mb-1">Hasil Simulasi Ujian</h2>
+            <p class="text-gray-500 text-sm mb-6">Laporan Hasil Computer Assisted Test (CAT)</p>
+            
+            <div class="bg-slate-50 p-4 rounded-xl text-left mb-6 space-y-2 border">
+                <p><strong>Nama:</strong> <span id="res-nama"></span></p>
+                <p><strong>Nomor Peserta:</strong> <span id="res-nomor"></span></p>
+                <hr>
+                <p><strong>Total Skor Akhir:</strong> <span id="res-skor" class="text-2xl font-bold text-blue-600"></span></p>
+                <p><strong>Status Kelulusan:</strong> <span id="res-status" class="font-bold"></span></p>
+            </div>
+
+            <button onclick="location.reload()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2 rounded-lg transition">
+                Ulangi Simulasi
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Database 110 Soal Lengkap dengan Pilihan A sampai E
+        const daftarSoal = [
+            // Analogi & Logika (TIU/TWK)
+            { id: 1, kategori: "TIU - Analogi", soal: "Mata : Melihat = Telinga : ...", opsi: ["A. Mendengar", "B. Berbicara", "C. Meraba", "D. Mencium", "E. Mengecap"], kunci: 0 },
+            { id: 2, kategori: "TIU - Analogi", soal: "Dokter : Pasien = Guru : ...", opsi: ["A. Sekolah", "B. Murid", "C. Buku", "D. Ujian", "E. Kelas"], kunci: 1 },
+            { id: 3, kategori: "TIU - Analogi", soal: "Api : Panas = Es : ...", opsi: ["A. Cair", "B. Putih", "C. Dingin", "D. Beku", "E. Air"], kunci: 2 },
+            { id: 4, kategori: "TIU - Analogi", soal: "Kupu-kupu : Kepompong = Katak : ...", opsi: ["A. Dewasa", "B. Kecebong", "C. Bertelur", "D. Air", "E. Rawa"], kunci: 1 },
+            { id: 5, kategori: "TIU - Analogi", soal: "Kapal : Laut = Pesawat : ...", opsi: ["A. Darat", "B. Udara", "C. Langit", "D. Cepat", "E. Bandara"], kunci: 1 },
+            { id: 6, kategori: "TIU - Analogi", soal: "Kunci : Gembok = Password : ...", opsi: ["A. Komputer", "B. Internet", "C. Akun", "D. Tombol", "E. Laptop"], kunci: 2 },
+            { id: 7, kategori: "TIU - Analogi", soal: "Bumi : Planet = Matahari : ...", opsi: ["A. Panas", "B. Bintang", "C. Galaksi", "D. Terang", "E. Tata Surya"], kunci: 1 },
+            { id: 8, kategori: "TIU - Analogi", soal: "Pena : Menulis = Pisau : ...", opsi: ["A. Tajam", "B. Logam", "C. Daging", "D. Memotong", "E. Dapur"], kunci: 3 },
+            
+            // Sinonim & Antonim
+            { id: 9, kategori: "TWK - Sinonim", soal: "Sinonim dari kata: Otentik = ...", opsi: ["A. Palsu", "B. Asli", "C. Buatan", "D. Lama", "E. Baru"], kunci: 1 },
+            { id: 10, kategori: "TWK - Antonim", soal: "Antonim dari kata: Tarif = ...", opsi: ["A. Biaya", "B. Bayar", "C. Gratis", "D. Harga", "E. Pajak"], kunci: 2 },
+            { id: 11, kategori: "TWK - Sinonim", soal: "Sinonim dari kata: Defisit = ...", opsi: ["A. Surplus", "B. Berlebih", "C. Kekurangan", "D. Stabil", "E. Hutang"], kunci: 2 },
+            { id: 12, kategori: "TWK - Antonim", soal: "Antonim dari kata: Masif = ...", opsi: ["A. Besar", "B. Padat", "C. Kecil / Mikro", "D. Luas", "E. Luas sekali"], kunci: 2 },
+            { id: 13, kategori: "TWK - Sinonim", soal: "Sinonim dari kata: Optimal = ...", opsi: ["A. Minimal", "B. Sedang", "C. Maksimal", "D. Cukup", "E. Kurang"], kunci: 2 },
+            { id: 14, kategori: "TWK - Antonim", soal: "Antonim dari kata: Linear = ...", opsi: ["A. Lurus", "B. Sejajar", "C. Berkelanjutan", "D. Acak / Non-linear", "E. Teratur"], kunci: 3 },
+
+            // Hitung Cepat / Numerik
+            { id: 15, kategori: "TIU - Numerik", soal: "Berapakah hasil dari 1/4 dari 1/2 = ...", opsi: ["A. 1/8", "B. 1/6", "C. 2/6", "D. 3/8", "E. 1/4"], kunci: 0 },
+            { id: 16, kategori: "TIU - Numerik", soal: "Bentuk pecahan biasa dari 0,25 adalah ...", opsi: ["A. 1/2", "B. 1/4", "C. 3/4", "D. 2/5", "E. 1/5"], kunci: 1 },
+            { id: 17, kategori: "TIU - Numerik", soal: "3 jam setara dengan ... menit.", opsi: ["A. 120", "B. 150", "C. 180", "D. 210", "E. 240"], kunci: 2 },
+            { id: 18, kategori: "TIU - Numerik", soal: "5 hari setara dengan ... jam.", opsi: ["A. 100", "B. 120", "C. 240", "D. 360", "E. 480"], kunci: 1 },
+            { id: 19, kategori: "TIU - Numerik", soal: "Berapakah nilai dari 1.200.000 × 12% = ...", opsi: ["A. 120.000", "B. 134.000", "C. 144.000", "D. 150.000", "E. 160.000"], kunci: 2 },
+            { id: 20, kategori: "TIU - Numerik", soal: "Hasil dari operasi hitung 2² × 3³ adalah ...", opsi: ["A. 72", "B. 108", "C. 144", "D. 216", "E. 54"], kunci: 1 },
+            { id: 21, kategori: "TIU - Numerik", soal: "Jika A adalah 20% lebih besar dari B. Jika B = 200, berapakah nilai A?", opsi: ["A. 220", "B. 240", "C. 250", "D. 260", "E. 280"], kunci: 1 },
+            { id: 22, kategori: "TIU - Numerik", soal: "400 adalah 25% dari angka ...", opsi: ["A. 1200", "B. 1400", "C. 1600", "D. 2000", "E. 1000"], kunci: 2 },
+            { id: 23, kategori: "TIU - Numerik", soal: "Kecepatan kendaraan 60 km/jam ditempuh selama 2 jam. Berapakah jarak yang ditempuh?", opsi: ["A. 100 km", "B. 120 km", "C. 140 km", "D. 160 km", "E. 180 km"], kunci: 1 },
+            { id: 24, kategori: "TIU - Numerik", soal: "3 orang dapat menyelesaikan pekerjaan dalam waktu 6 hari. Jika dikerjakan 6 orang, waktu yang dibutuhkan adalah ...", opsi: ["A. 2 hari", "B. 3 hari", "C. 4 hari", "D. 5 hari", "E. 1 hari"], kunci: 1 },
+            { id: 25, kategori: "TIU - Numerik", soal: "Berapakah hasil dari 8 : 2(2+2) berdasarkan aturan perhitungan baku?", opsi: ["A. 1", "B. 8", "C. 16", "D. 32", "E. 4"], kunci: 2 },
+            { id: 26, kategori: "TIU - Numerik", soal: "Berapakah hasil dari 90% + 15% = ...", opsi: ["A. 100%", "B. 105%", "C. 110%", "D. 115%", "E. 120%"], kunci: 1 },
+            { id: 27, kategori: "TIU - Numerik", soal: "Berapakah hasil dari 900 dikurangi 30%?", opsi: ["A. 600", "B. 630", "C. 670", "D. 700", "E. 750"], kunci: 2 },
+            { id: 28, kategori: "TIU - Numerik", soal: "Berapakah nilai akar kuadrat dari √196?", opsi: ["A. 12", "B. 13", "C. 14", "D. 16", "E. 18"], kunci: 2 },
+
+            // Silogisme / Logika
+            { id: 29, kategori: "TIU - Silogisme", soal: "Jika nilai ≥ 75 maka lulus. Beni mendapat nilai 74. Kesimpulannya adalah...", opsi: ["A. Lulus", "B. Tidak lulus", "C. Remedial", "D. Mengulang", "E. Bersyarat"], kunci: 1 },
+            { id: 30, kategori: "TIU - Silogisme", soal: "Semua manusia bernapas. Ali adalah manusia. Kesimpulannya adalah...", opsi: ["A. Ali tidak bernapas", "B. Ali bernapas", "C. Manusia pasti Ali", "D. Tidak dapat disimpulkan", "E. Ali makhluk hidup"], kunci: 1 },
+            { id: 31, kategori: "TIU - Silogisme", soal: "Semua komputer butuh listrik. Laptop adalah komputer. Kesimpulannya adalah...", opsi: ["A. Laptop tidak butuh listrik", "B. Laptop butuh listrik", "C. Listrik untuk laptop", "D. Semua salah", "E. Laptop baterai"], kunci: 1 },
+            { id: 32, kategori: "TIU - Silogisme", soal: "Jika X maka Y. Jika tidak Y maka...", opsi: ["A. Tidak X", "B. Tetap X", "C. Menjadi Z", "D. Tidak dapat disimpulkan", "E. Pasti X"], kunci: 0 },
+            { id: 33, kategori: "TIU - Silogisme", soal: "Semua bunga harum. Mawar adalah bunga. Kesimpulannya adalah...", opsi: ["A. Mawar tidak harum", "B. Mawar harum", "C. Bunga pasti mawar", "D. Tidak harum", "E. Mawar berduri"], kunci: 1 },
+            { id: 34, kategori: "TIU - Silogisme", soal: "Hanya guru yang boleh masuk ruang guru. Dito masuk ruang guru. Kesimpulannya adalah...", opsi: ["A. Dito bukan guru", "B. Dito guru", "C. Dito tamu", "D. Tidak dapat disimpulkan", "E. Dito kepala sekolah"], kunci: 1 },
+            { id: 35, kategori: "TIU - Silogisme", soal: "Semua siswa memakai seragam. Dia tidak pakai seragam. Kesimpulannya adalah...", opsi: ["A. Dia siswa", "B. Bukan siswa", "C. Guru", "D. Pengurus sekolah", "E. Alumni"], kunci: 1 },
+            { id: 36, kategori: "TIU - Silogisme", soal: "Jika makan pedas maka sakit perut. Rina sakit perut. Kesimpulannya adalah...", opsi: ["A. Rina makan pedas", "B. Rina tidak makan pedas", "C. Tidak dapat disimpulkan", "D. Pasti karena sambal", "E. Rina suka cabai"], kunci: 2 },
+            { id: 37, kategori: "TIU - Silogisme", soal: "Semua mobil beroda. Becak beroda. Kesimpulannya adalah...", opsi: ["A. Becak adalah mobil", "B. Mobil adalah becak", "C. Tidak dapat disimpulkan", "D. Keduanya sama", "E. Becak bermesin"], kunci: 2 },
+            { id: 38, kategori: "TIU - Silogisme", soal: "Jika jas hujan dipakai maka tidak basah. Budi basah. Kesimpulannya adalah...", opsi: ["A. Budi memakai jas hujan", "B. Budi tidak memakai jas hujan", "C. Jas hujan bocor", "D. Hujan deras", "E. Budi mandi"], kunci: 1 },
+            { id: 39, kategori: "TIU - Silogisme", soal: "Jika A bekerja keras maka A sukses. A sukses. Kesimpulannya adalah...", opsi: ["A. A bekerja keras", "B. A tidak bekerja keras", "C. Tidak dapat disimpulkan", "D. A malas", "E. A beruntung"], kunci: 2 },
+            { id: 40, kategori: "TIU - Silogisme", soal: "Setiap karyawan punya ID. Aldi tidak punya ID. Kesimpulannya adalah...", opsi: ["A. Aldi karyawan", "B. Bukan karyawan", "C. ID hilang", "D. Atasan", "E. Karyawan baru"], kunci: 1 },
+            { id: 41, kategori: "TIU - Silogisme", soal: "Jika AC rusak maka ruangan panas. Ruangan tidak panas. Kesimpulannya adalah...", opsi: ["A. AC rusak", "B. AC tidak rusak", "C. Ruangan dingin", "D. Listrik padam", "E. Kipas angin hidup"], kunci: 1 },
+            { id: 42, kategori: "TIU - Silogisme", soal: "Semua tanaman butuh cahaya. Jamur bukan tanaman. Kesimpulannya adalah...", opsi: ["A. Jamur butuh cahaya", "B. Tidak wajib butuh cahaya", "C. Jamur tanaman", "D. Semua salah", "E. Jamur di tempat gelap"], kunci: 1 },
+            { id: 43, kategori: "TIU - Silogisme", soal: "Semua pejabat adalah PNS. Rahman adalah PNS. Kesimpulannya adalah...", opsi: ["A. Rahman pasti pejabat", "B. Tidak dapat disimpulkan", "C. Rahman bukan PNS", "D. Pejabat daerah", "E. Rahman pensiunan"], kunci: 1 },
+
+            // Soal TKP (Karakteristik Pribadi - Lengkap A sampai E dengan bobot nilai 1-5)
+            { id: 44, kategori: "TKP - Pelayanan Publik", soal: "Warga meminta layanan cepat karena darurat. Sikap Anda...", opsi: ["A. Tolak", "B. Suruh antre normal", "C. Tanyakan kondisi dulu", "D. Prioritaskan sesuai SOP darurat", "E. Minta izin atasan lalu bantu"], bobot: [1, 2, 3, 5, 4] },
+            { id: 45, kategori: "TKP - Pelayanan Publik", soal: "Pelayanan di loket penuh. Sikap Anda...", opsi: ["A. Keluar dulu", "B. Tunggu sepi", "C. Membantu jika diminta", "D. Bantu aktif atur antrean", "E. Membantu sebisanya"], bobot: [1, 2, 3, 5, 4] },
+            { id: 46, kategori: "TKP - Pelayanan Publik", soal: "Sistem online error dan warga menunggu. Sikap Anda...", opsi: ["A. Bilang 'tunggu saja'", "B. Tidak peduli", "C. Tawarkan alternatif manual", "D. Minta warga kembali besok", "E. Menenangkan dulu"], bobot: [2, 1, 5, 3, 4] },
+            { id: 47, kategori: "TKP - Pelayanan Publik", soal: "Ada warga bingung aturan baru. Sikap Anda...", opsi: ["A. Suruh baca sendiri", "B. Jawab singkat", "C. Beri poin penting", "D. Jelaskan lengkap + contoh", "E. Beri brosur saja"], bobot: [1, 2, 3, 5, 4] },
+            { id: 48, kategori: "TKP - Integritas", soal: "Anda melihat pungutan liar kecil. Sikap Anda...", opsi: ["A. Ikut", "B. Diam", "C. Larang", "D. Laporkan resmi", "E. Nasehati"], bobot: [1, 2, 4, 5, 3] },
+            { id: 49, kategori: "TKP - Integritas", soal: "Anda ditawari hadiah oleh warga. Sikap Anda...", opsi: ["A. Ambil", "B. Ambil diam-diam", "C. Tolak sopan", "D. Terima tapi catat", "E. Pertimbangkan dulu"], bobot: [1, 2, 5, 4, 3] },
+            { id: 50, kategori: "TKP - Integritas", soal: "Anda salah hitung anggaran kantor. Sikap Anda...", opsi: ["A. Sembunyikan", "B. Biarkan", "C. Perbaiki & laporkan", "D. Minta bantuan rekan", "E. Tunda revisi"], bobot: [1, 2, 5, 4, 3] },
+            { id: 51, kategori: "TKP - Integritas", soal: "Anda dapat informasi sensitif instansi. Sikap Anda...", opsi: ["A. Sebarkan", "B. Cerita ke teman", "C. Simpan", "D. Jaga penuh kerahasiaan", "E. Bicarakan di grup"], bobot: [1, 2, 4, 5, 3] },
+            { id: 52, kategori: "TKP - Profesionalisme", soal: "Ada perbedaan pendapat dalam tim. Sikap Anda...", opsi: ["A. Ikut debat panas", "B. Diam saja", "C. Ajak voting", "D. Dengarkan semua pihak & ambil solusi terbaik", "E. Selesaikan cepat tanpa diskusi"], bobot: [2, 1, 4, 5, 3] },
+            { id: 53, kategori: "TKP - Kerja Sama", soal: "Anggota tim sakit mendadak. Sikap Anda...", opsi: ["A. Biarkan", "B. Menyalahkan", "C. Ambil alih sebagian tugasnya", "D. Kritik", "E. Tunggu pulih"], bobot: [1, 2, 5, 3, 4] },
+            { id: 54, kategori: "TKP - Adaptabilitas", soal: "Ada tugas mendadak dari atasan. Sikap Anda...", opsi: ["A. Menolak", "B. Mengeluh", "C. Bantu tim dengan cepat", "D. Minta ditunda", "E. Tunggu arahan"], bobot: [1, 2, 5, 3, 4] },
+            { id: 55, kategori: "TKP - Profesionalisme", soal: "Ada anggota tim perfeksionis sehingga lambat. Sikap Anda...", opsi: ["A. Biarkan", "B. Marahi", "C. Beri batas waktu jelas", "D. Suruh bekerja cepat saja", "E. Kritik perlahan"], bobot: [2, 1, 5, 3, 4] },
+            { id: 56, kategori: "TKP - Profesionalisme", soal: "Anda mendapat banyak kritik. Sikap Anda...", opsi: ["A. Marah", "B. Sedih berhari-hari", "C. Ambil yang berguna", "D. Terima tapi kesal", "E. Hindari orang itu"], bobot: [1, 2, 5, 3, 4] },
+            { id: 57, kategori: "TKP - Profesionalisme", soal: "Tekanan deadline tinggi di kantor. Sikap Anda...", opsi: ["A. Panik", "B. Menyerah", "C. Atur waktu", "D. Lari dari tugas", "E. Kerja sambil stres"], bobot: [1, 2, 5, 3, 4] },
+            { id: 58, kategori: "TKP - Profesionalisme", soal: "Proyek yang Anda pimpin gagal. Sikap Anda...", opsi: ["A. Menyalahkan situasi", "B. Menghilang", "C. Pelajari kesalahan", "D. Cerita ke semua orang", "E. Salahkan rekan"], bobot: [1, 2, 5, 3, 4] },
+            { id: 59, kategori: "TKP - Profesionalisme", soal: "Rekan kerja memprovokasi Anda. Sikap Anda...", opsi: ["A. Balas", "B. Diam tapi kesal", "C. Abaikan & tetap fokus", "D. Lapor atasan", "E. Lawan halus"], bobot: [1, 2, 5, 4, 3] },
+            { id: 60, kategori: "TKP - Profesionalisme", soal: "Anda diberi target kerja tinggi. Sikap Anda...", opsi: ["A. Protes keras", "B. Mengeluh", "C. Pecah target jadi bagian kecil", "D. Kerjakan apa adanya", "E. Minta bantuan rekan"], bobot: [1, 2, 5, 3, 4] },
+            { id: 61, kategori: "TKP - Profesionalisme", soal: "Anda sedang sibuk lalu diminta bantuan hal kecil. Sikap Anda...", opsi: ["A. Tolak", "B. Abaikan", "C. Kerjakan cepat lalu lanjut kerja utama", "D. Minta orang lain", "E. Tunda lama"], bobot: [1, 2, 5, 3, 4] },
+            { id: 62, kategori: "TKP - Pelayanan Publik", soal: "Ada warga meminta informasi yang belum Anda hafal. Sikap Anda...", opsi: ["A. Mengarang", "B. Bilang tidak tahu", "C. Cek SOP & beri jawaban akurat", "D. Suruh tanya orang lain", "E. Cari nanti"], bobot: [1, 2, 5, 3, 4] },
+            { id: 63, kategori: "TKP - Profesionalisme", soal: "Anda diminta kerja lembur mendadak. Sikap Anda...", opsi: ["A. Tolak", "B. Menghilang", "C. Terima & selesaikan", "D. Tanya kompensasi dulu", "E. Tunda"], bobot: [1, 2, 5, 4, 3] },
+            { id: 64, kategori: "TKP - Integritas", soal: "Ada kesalahan data warga pada dokumen. Sikap Anda...", opsi: ["A. Biarkan", "B. Tunda", "C. Perbaiki langsung", "D. Serahkan ke orang lain", "E. Laporkan besok"], bobot: [1, 2, 5, 3, 4] },
+            { id: 65, kategori: "TKP - Pelayanan Publik", soal: "Anda melihat antrean panjang tetapi loket lain kosong. Sikap Anda...", opsi: ["A. Biar saja", "B. Tidak peduli", "C. Usulkan buka loket tambahan", "D. Lapor rekan", "E. Tunggu atasan"], bobot: [1, 2, 5, 4, 3] },
+            { id: 66, kategori: "TKP - Pelayanan Publik", soal: "Ada komplain besar dari masyarakat. Sikap Anda...", opsi: ["A. Salahkan warga", "B. Hindari", "C. Dengarkan, catat, tindak lanjuti", "D. Oper ke rekan", "E. Tunda"], bobot: [1, 2, 5, 3, 4] },
+            { id: 67, kategori: "TKP - Adaptabilitas", soal: "Anda ditugaskan hal baru yang tidak Anda kuasai. Sikap Anda...", opsi: ["A. Menolak", "B. Mengeluh", "C. Minta arahan & kerjakan", "D. Coba-coba tanpa ilmu", "E. Oper ke orang lain"], bobot: [1, 2, 5, 3, 4] },
+            { id: 68, kategori: "TKP - Pelayanan Publik", soal: "Warga meminta bantuan cepat untuk pengurusan dokumen. Sikap Anda...", opsi: ["A. Minta uang", "B. Tolak", "C. Layani sesuai SOP, cepat & benar", "D. Tunda", "E. Arahkan ke bagian lain"], bobot: [1, 2, 5, 3, 4] },
+            { id: 69, kategori: "TKP - Profesionalisme", soal: "Anda mendapat tugas berulang yang membosankan. Sikap Anda...", opsi: ["A. Abaikan", "B. Lambat", "C. Tetap disiplin & konsisten", "D. Kerjakan asal", "E. Minta orang lain"], bobot: [1, 2, 5, 3, 4] },
+            { id: 70, kategori: "TKP - Kreativitas", soal: "Anda diminta ide untuk peningkatan layanan publik. Sikap Anda...", opsi: ["A. Diam", "B. Bilang tidak punya ide", "C. Beri minimal satu ide realistis", "D. Tunda", "E. Salin ide orang lain"], bobot: [1, 2, 5, 3, 4] },
+            { id: 71, kategori: "TKP - Profesionalisme", soal: "Anda sedang capek tetapi warga tetap menunggu pelayanan. Sikap Anda...", opsi: ["A. Tidak peduli", "B. Kasar", "C. Tetap profesional & ramah", "D. Melambat", "E. Istirahat tanpa izin"], bobot: [1, 2, 5, 3, 4] },
+
+            // Soal TWK (Nasionalisme, Pancasila, UUD 1945 - Lengkap A sampai E)
+            { id: 72, kategori: "TWK - Pancasila", soal: "Dalam sistem demokrasi, rakyat memegang kekuasaan tertinggi yang sering disebut sebagai...", opsi: ["A. Oligarki", "B. Monarki", "C. Demokrasi", "D. Republik", "E. Autokrasi"], kunci: 2 },
+            { id: 73, kategori: "TWK - Tata Negara", soal: "Lembaga negara yang bertugas mengawasi pengelolaan dan tanggung jawab keuangan negara adalah...", opsi: ["A. KPK", "B. BPK", "C. MA", "D. KPU", "E. MK"], kunci: 1 },
+            { id: 74, kategori: "TWK - Nasionalisme", soal: "Dalam hubungan internasional, Indonesia menganut prinsip politik luar negeri...", opsi: ["A. Bebas aktif", "B. Netral mutlak", "C. Blok Barat", "D. Blok Timur", "E. Non-blok pasif"], kunci: 0 },
+            { id: 75, kategori: "TWK - UUD 1945", soal: "Ketentuan mengenai hak dan kewajiban warga negara dalam usaha pertahanan dan keamanan negara diatur dalam UUD 1945 pasal...", opsi: ["A. Pasal 27 ayat 3", "B. Pasal 28 ayat A", "C. Pasal 31 ayat 1", "D. Pasal 33 ayat 1", "E. Pasal 30 ayat 1"], kunci: 0 },
+            { id: 76, kategori: "TWK - Sejarah", soal: "Organisasi yang bertugas merumus dasar negara sebelum Indonesia merdeka adalah...", opsi: ["A. BPUPKI", "B. PPKI", "C. KNIP", "D. PKI", "E. PETA"], kunci: 0 },
+            { id: 77, kategori: "TWK - Hukum", soal: "Norma hukum tertulis yang memiliki kedudukan tertinggi dalam hierarki peraturan perundang-undangan di Indonesia adalah...", opsi: ["A. Undang-Undang", "B. Perpres", "C. Pancasila", "D. Peraturan Pemerintah", "E. Tap MPR"], kunci: 2 },
+            { id: 78, kategori: "TWK - Pancasila", soal: "Nilai dalam Pancasila yang bersifat mutlak dan universal terkandung terutama pada...", opsi: ["A. Sila keempat", "B. Sila kedua", "C. Sila kelima", "D. Sila ketiga", "E. Sila pertama"], kunci: 1 },
+            { id: 79, kategori: "TWK - Pertahanan", soal: "Sistem pertahanan dan keamanan negara yang dianut Republik Indonesia adalah...", opsi: ["A. Pertahanan rakyat semesta", "B. Pertahanan elit militer", "C. Pertahanan mandatori", "D. Pertahanan parsial", "E. Pertahanan modern"], kunci: 0 },
+            { id: 80, kategori: "TWK - UUD 1945", soal: "Hingga saat ini, UUD 1945 telah mengalami amendemen sebanyak...", opsi: ["A. 1 kali", "B. 2 kali", "C. 3 kali", "D. 4 kali", "E. Belum pernah"], kunci: 3 },
+            { id: 81, kategori: "TWK - Kebangsaan", soal: "Semboyan Bhinneka Tunggal Ika merupakan dasar utama dalam mewujudkan...", opsi: ["A. Keanekaragaman flora fauna", "B. Kerja sama perdagangan", "C. Persatuan dan kesatuan bangsa", "D. Pertumbuhan ekonomi nasional", "E. Hubungan diplomatik"], kunci: 2 },
+            { id: 82, kategori: "TWK - Tata Negara", soal: "Ketua Majelis Permusyawaratan Rakyat (MPR) dipilih dari dan oleh...", opsi: ["A. Presiden", "B. Rakyat langsung", "C. Anggota MPR", "D. Mahkamah Konstitusi", "E. Partai politik"], kunci: 2 },
+            { id: 83, kategori: "TWK - Hukum", soal: "Lembaga peradilan tertinggi di bawah Mahkamah Agung yang memegang kekuasaan kehakiman adalah...", opsi: ["A. Mahkamah Agung", "B. Mahkamah Konstitusi", "C. PTUN", "D. Pengadilan Negeri", "E. Pengadilan Tinggi"], kunci: 0 },
+            { id: 84, kategori: "TWK - Hukum", soal: "Sumber dari segala sumber hukum negara Republik Indonesia adalah...", opsi: ["A. Peraturan Pemerintah", "B. Perda", "C. UUD 1945", "D. Pancasila", "E. Keputusan Presiden"], kunci: 3 },
+            { id: 85, kategori: "TWK - Kewarganegaraan", soal: "Warga negara asing yang ingin menjadi Warga Negara Indonesia dapat melalui proses permohonan yang disebut...", opsi: ["A. Deportasi", "B. Naturalisasi", "C. Mutasi", "D. Ekstradisi", "E. Asimilasi"], kunci: 1 },
+            { id: 86, kategori: "TWK - Tata Negara", soal: "Lembaga negara yang memiliki kewenangan penuh untuk mengubah dan menetapkan UUD adalah...", opsi: ["A. DPR", "B. Presiden", "C. MPR", "D. Mahkamah Agung", "E. Menteri Dalam Negeri"], kunci: 2 },
+            { id: 87, kategori: "TWK - Kewarganegaraan", soal: "Salah satu bentuk kewajiban konstitusional WNI terhadap negara adalah...", opsi: ["A. Membayar pajak", "B. Mengimpor barang mewah", "C. Menjadi PNS", "D. Melanjutkan kuliah S2", "E. Memiliki perusahaan"], kunci: 0 },
+            { id: 88, kategori: "TWK - Tata Negara", soal: "Menteri-menteri negara di kabinet diangkat dan diberhentikan oleh...", opsi: ["A. DPR", "B. KPU", "C. Presiden", "D. Mahkamah Agung", "E. MPR"], kunci: 2 },
+            { id: 89, kategori: "TWK - Tata Negara", soal: "Hak untuk melakukan penyelidikan terhadap kebijakan pemerintah yang penting dan strategis dimiliki oleh...", opsi: ["A. Presiden", "B. DPR", "C. Mahkamah Agung", "D. Kepolisian", "E. BPK"], kunci: 1 },
+            { id: 90, kategori: "TWK - Kewarganegaraan", soal: "Negara Indonesia menganut asas kewarganegaraan berdasarkan tempat kelahiran dan keturunan yaitu...", opsi: ["A. Ius soli dan ius sanguinis", "B. Ius soli saja", "C. Ius sanguinis saja", "D. Tanpa asas tertentu", "E. Asas ganda terbatas"], kunci: 0 },
+            { id: 91, kategori: "TWK - Sejarah", soal: "Bendera Sang Saka Merah Putih untuk pertama kalinya dikibarkan di...", opsi: ["A. Bandung", "B. Surabaya", "C. Jakarta", "D. Yogyakarta", "E. Semarang"], kunci: 2 },
+            { id: 92, kategori: "TWK - Pancasila", soal: "Paham radikalisme dan terorisme sangat bertentangan dengan nilai-nilai yang terkandung dalam...", opsi: ["A. Nilai-nilai Pancasila", "B. Kemajuan teknologi", "C. Kesadaran sosial masyarakat", "D. Perkembangan ilmu pengetahuan", "E. Globalisasi modern"], kunci: 0 },
+            { id: 93, kategori: "TWK - Tata Negara", soal: "Lembaga independen yang menyelenggarakan pemilihan umum di Indonesia adalah...", opsi: ["A. KPU", "B. Bawaslu", "C. DKPP", "D. Ketiganya bekerja sama", "E. Mahkamah Konstitusi"], kunci: 0 },
+            { id: 94, kategori: "TWK - Bela Negara", soal: "Keikutsertaan dalam upaya pembelaan negara merupakan hak dan kewajiban bagi...", opsi: ["A. Anggota TNI saja", "B. Seluruh WNI", "C. Pegawai Negeri Sipil saja", "D. Mahasiswa hukum", "E. Tokoh masyarakat"], kunci: 1 },
+            { id: 95, kategori: "TWK - UUD 1945", soal: "Sifat dari Undang-Undang Dasar 1945 adalah singkat dan...", opsi: ["A. Kaku", "B. Supel dan terbuka", "C. Tidak bisa diubah selamanya", "D. Bersifat rahasia", "E. Mutlak tertutup"], kunci: 1 },
+            { id: 96, kategori: "TWK - Pancasila", soal: "Sila Ketuhanan Yang Maha Esa dalam Pancasila menegaskan tentang...", opsi: ["A. Kebebasan tanpa batas", "B. Pengakuan terhadap Eksistensi Tuhan", "C. Kekuatan militer negara", "D. Kekayaan sumber daya alam", "E. Sekularisme negara"], kunci: 1 },
+            { id: 97, kategori: "TWK - Pancasila", soal: "Pemahaman mengenai wawasan dan pengetahuan kebangsaan sering disebut dengan istilah...", opsi: ["A. Pengabdian sosial", "B. Civic knowledge", "C. Tanggung jawab moral", "D. Etika birokrasi", "E. Sosialisasi hukum"], kunci: 1 },
+            { id: 98, kategori: "TWK - Sejarah", soal: "Proklamasi Kemerdekaan Republik Indonesia dikumandangkan atas nama bangsa Indonesia oleh...", opsi: ["A. Wahid Hasyim", "B. Soekarno - Hatta", "C. Moh. Yamin", "D. Mr. Soepomo", "E. Ahmad Soebardjo"], kunci: 1 },
+            { id: 99, kategori: "TWK - Sejarah", soal: "Terbentuknya bangsa Indonesia melalui proses sejarah yang panjang didasari atas...", opsi: ["A. Perjanjian antar suku", "B. Takdir sejarah dan perjuangan bersama", "C. Perang saudara antaretnis", "D. Perintah kolonial asing", "E. Pakta pertahanan"], kunci: 1 },
+            { id: 100, kategori: "TWK - Bela Negara", soal: "Segala bentuk upaya menjaga keutuhan wilayah dan kedaulatan negara disebut sebagai...", opsi: ["A. Pelanggaran HAM", "B. Tindak korupsi", "C. Upaya bela negara", "D. Provokasi massa", "E. Politik praktis"], kunci: 2 },
+            { id: 101, kategori: "TWK - Otonomi", soal: "Penerapan sistem otonomi daerah di Indonesia bertujuan utama untuk...", opsi: ["A. Memecah belah negara", "B. Menyeragamkan seluruh budaya daerah", "C. Mendekatkan pelayanan publik kepada rakyat", "D. Menghapus peran pemerintah pusat", "E. Otonomi mutlak wilayah"], kunci: 2 },
+            { id: 102, kategori: "TWK - Hukum", soal: "Hak Asasi Manusia (HAM) yang bersifat mendasar bagi setiap manusia diakui sebagai hak yang...", opsi: ["A. Universal", "B. Hanya milik negara tertentu", "C. Untuk kelompok khusus", "D. Milik golongan elit", "E. Terbatas wilayah"], kunci: 0 },
+            { id: 103, kategori: "TWK - Kebangsaan", soal: "Arti harfiah dari semboyan Bhinneka Tunggal Ika adalah...", opsi: ["A. Berbeda-beda tetapi tetap satu jua", "B. Harus sama dalam segala hal", "C. Tidak boleh ada perbedaan", "D. Satu nusa tanpa perbedaan", "E. Bersatu kita teguh"], kunci: 0 },
+            { id: 104, kategori: "TWK - Sejarah", soal: "Sistem demokrasi langsung dalam sejarah Nusantara pernah ditemui pada masa...", opsi: ["A. Orde Lama", "B. Orde Baru", "C. Era Reformasi", "D. Kerajaan-kerajaan tradisional awal", "E. Masa kolonial Belanda"], kunci: 3 },
+            { id: 105, kategori: "TWK - Hukum", soal: "Penegakan hukum dan ketertiban di dalam negeri secara langsung dijalankan oleh lembaga...", opsi: ["A. Presiden Republik Indonesia", "B. Kepolisian Negara Republik Indonesia", "C. Tentara Nasional Indonesia", "D. BKKBN", "E. Kejaksaan Agung"], kunci: 1 },
+            { id: 106, kategori: "TWK - UUD 1945", soal: "Ketentuan konstitusional mengenai hak-hak dasar warga negara diatur dalam UUD 1945 pada pasal...", opsi: ["A. Pasal 27 sampai 34", "B. Ketetapan MPR", "C. Undang-Undang Desa", "D. Peraturan Presiden", "E. Pasal 1 sampai 3"], kunci: 0 },
+            { id: 107, kategori: "TWK - Pancasila", soal: "Sila keempat Pancasila sangat mengutamakan prinsip...", opsi: ["A. Keputusan sepihak", "B. Musyawarah mufakat", "C. Voting suara terbanyak", "D. Keputusan mutlak presiden", "E. Kekuasaan mayoritas"], kunci: 1 },
+            { id: 108, kategori: "TWK - Pancasila", soal: "Nilai Ketuhanan dalam Pancasila mencakup sikap nyata berupa...", opsi: ["A. Kebebasan tanpa batas beragama", "B. Toleransi antarumat beragama", "C. Pemaksaan keyakinan", "D. Dominasi kelompok mayoritas", "E. Ateisme terstruktur"], kunci: 1 },
+            { id: 109, kategori: "TWK - UUD 1945", soal: "Pembukaan UUD 1945 tidak dapat diubah oleh siapapun karena di dalamnya memuat...", opsi: ["A. Pernyataan sakral", "B. Tujuan dan dasar negara Republik Indonesia", "C. Sila-sila Pancasila secara utuh", "D. Semua jawaban di atas benar", "E. Batang tubuh utama"], kunci: 3 },
+            { id: 110, kategori: "TWK - Nasionalisme", soal: "Pelaksanaan hubungan internasional bagi Indonesia memiliki arti penting guna...", opsi: ["A. Mengisolasi diri dari pergaulan dunia", "B. Mempersiapkan perang terbuka", "C. Kerja sama global dan perdamaian dunia", "D. Menutup akses informasi luar", "E. Aliansi militer tertutup"], kunci: 2 }
+        ];
+
+        let peserta = { nama: "", nomor: "" };
+        let currentIndex = 0;
+        let jawabanUser = {}; 
+        let waktuSisa = 6000; // 100 menit (6000 detik) sesuai durasi tes SKD asli
+        let intervalTimer;
+
+        function mulaiUjianApp() {
+            const nama = document.getElementById('input-nama').value.trim();
+            const nomor = document.getElementById('input-nomor').value.trim();
+
+            if (!nama || !nomor) {
+                alert("Mohon isi Nama dan Nomor Peserta terlebih dahulu!");
+                return;
+            }
+
+            peserta.nama = nama;
+            peserta.nomor = nomor;
+
+            document.getElementById('info-peserta').innerText = `${nama} (${nomor})`;
+            document.getElementById('halaman-login').classList.add('hidden');
+            document.getElementById('halaman-ujian').classList.remove('hidden');
+
+            loadSoal();
+            mulaiTimer();
+        }
+
+        function mulaiTimer() {
+            const timerDisplay = document.getElementById('timer');
+            
+            intervalTimer = setInterval(() => {
+                let jam = Math.floor(waktuSisa / 3600);
+                let menit = Math.floor((waktuSisa % 3600) / 60);
+                let detik = waktuSisa % 60;
+
+                timerDisplay.innerText = 
+                    (jam < 10 ? "0" + jam : jam) + ":" + 
+                    (menit < 10 ? "0" + menit : menit) + ":" + 
+                    (detik < 10 ? "0" + detik : detik);
+
+                if (waktuSisa <= 0) {
+                    clearInterval(intervalTimer);
+                    alert("Waktu ujian telah habis!");
+                    selesaiUjian();
+                } else {
+                    waktuSisa--;
+                }
+            }, 1000);
+        }
+
+        function initNavigasi() {
+            const navGrid = document.getElementById('nav-grid');
+            navGrid.innerHTML = '';
+            daftarSoal.forEach((item, index) => {
+                let btn = document.createElement('button');
+                btn.innerText = index + 1;
+                let isTerisi = jawabanUser[index] !== undefined;
+                btn.className = `p-2 rounded-lg font-bold text-sm border transition ${
+                    isTerisi 
+                    ? 'bg-blue-600 text-white border-blue-600' 
+                    : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
+                }`;
+                btn.onclick = () => {
+                    currentIndex = index;
+                    loadSoal();
+                };
+                navGrid.appendChild(btn);
+            });
+        }
+
+        function loadSoal() {
+            const soal = daftarSoal[currentIndex];
+            document.getElementById('nomor-soal').innerText = `Soal No. ${currentIndex + 1}`;
+            document.getElementById('kategori-soal').innerText = soal.kategori;
+            document.getElementById('teks-soal').innerText = soal.soal;
+
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            soal.opsi.forEach((opsiText, i) => {
+                let isChecked = jawabanUser[currentIndex] === i ? 'checked' : '';
+                let div = document.createElement('label');
+                div.className = `flex items-center p-3 border rounded-lg cursor-pointer transition ${isChecked ? 'border-blue-600 bg-blue-50' : 'border-gray-200 hover:bg-gray-50'}`;
+                div.innerHTML = `
+                    <input type="radio" name="jawaban" value="${i}" ${isChecked} onclick="pilihJawaban(${i})" class="mr-3 text-blue-600">
+                    <span class="text-gray-700">${opsiText}</span>
+                `;
+                optionsContainer.appendChild(div);
+            });
+            initNavigasi();
+        }
+
+        function pilihJawaban(i) {
+            jawabanUser[currentIndex] = i;
+            initNavigasi();
+        }
+
+        function nextSoal() {
+            if (currentIndex < daftarSoal.length - 1) {
+                currentIndex++;
+                loadSoal();
+            }
+        }
+
+        function prevSoal() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                loadSoal();
+            }
+        }
+
+        function konfirmasiSelesai() {
+            let jumlahTerisi = Object.keys(jawabanUser).length;
+            let jumlahKosong = daftarSoal.length - jumlahTerisi;
+
+            let konfirm = confirm(`Konfirmasi Akhir Ujian:\n- Soal terjawab: ${jumlahTerisi}\n- Soal kosong: ${jumlahKosong}\n\nYakin ingin mengakhiri ujian dan melihat hasil skor?`);
+            if (konfirm) {
+                clearInterval(intervalTimer);
+                selesaiUjian();
+            }
+        }
+
+        function selesaiUjian() {
+            let totalSkor = 0;
+            
+            daftarSoal.forEach((item, index) => {
+                let ans = jawabanUser[index];
+                if (ans !== undefined) {
+                    if (item.bobot) {
+                        // Perhitungan khusus soal TKP (bobot 1 s.d 5)
+                        totalSkor += item.bobot[ans];
+                    } else {
+                        // Perhitungan TWK / TIU (Benar = 5, Salah = 0)
+                        if (ans === item.kunci) {
+                            totalSkor += 5;
+                        }
+                    }
+                }
+            });
+
+            document.getElementById('halaman-ujian').classList.add('hidden');
+            document.getElementById('halaman-hasil').classList.remove('hidden');
+
+            document.getElementById('res-nama').innerText = peserta.nama;
+            document.getElementById('res-nomor').innerText = peserta.nomor;
+            document.getElementById('res-skor').innerText = totalSkor;
+
+            let statusEl = document.getElementById('res-status');
+            if (totalSkor >= 350) {
+                statusEl.innerText = "LULUS (Sangat Memuaskan)";
+                statusEl.className = "font-bold text-green-600";
+            } else {
+                statusEl.innerText = "BELUM LULUS (Perlu Peningkatan)";
+                statusEl.className = "font-bold text-red-600";
+            }
+        }
+    </script>
+</body>
+</html>

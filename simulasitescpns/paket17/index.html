@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SANG PNS - Simulasi CAT SKD CPNS (Paket 17)</title>
+    <!-- Tailwind CSS v3 CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 font-sans">
+
+    <!-- HALAMAN LOGIN / REGISTRASI PESERTA -->
+    <div id="halaman-login" class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
+            <div class="text-center mb-6">
+                <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-3 py-1 rounded-full">SANG PNS - PAKET SOAL 17</span>
+                <h2 class="text-2xl font-bold text-emerald-900 mt-2">Simulasi CAT SKD CPNS</h2>
+                <p class="text-gray-500 text-sm mt-1">Uji mental, kecepatan, dan akurasi ala BKN</p>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Lengkap</label>
+                    <input type="text" id="input-nama" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600" placeholder="Contoh: Febri Delise">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Nomor Peserta / NIK</label>
+                    <input type="text" id="input-nomor" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600" placeholder="Contoh: 610012345678">
+                </div>
+                <button onclick="mulaiUjianApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg transition shadow-md">
+                    Mulai Ujian Paket 17
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HALAMAN UTAMA UJIAN -->
+    <div id="halaman-ujian" class="hidden">
+        <header class="bg-emerald-900 text-white p-4 shadow-md flex justify-between items-center">
+            <div>
+                <h1 class="text-lg font-bold">CAT BKN - Seleksi Kompetensi Dasar (SKD)</h1>
+                <p id="info-peserta" class="text-xs text-emerald-200"></p>
+            </div>
+            <div id="timer" class="bg-red-600 px-4 py-2 rounded-lg font-mono font-bold text-lg shadow-inner">
+                10:00
+            </div>
+        </header>
+
+        <main class="max-w-6xl mx-auto p-4 grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+            <!-- Bagian Soal (Kiri - 3 Kolom) -->
+            <div class="md:col-span-3 bg-white p-6 rounded-xl shadow-md flex flex-col justify-between min-h-[480px]">
+                <div>
+                    <div class="flex justify-between items-center border-b pb-3 mb-4">
+                        <span id="nomor-soal" class="font-bold text-lg text-emerald-900">Soal No. 1</span>
+                        <span id="kategori-soal" class="text-sm bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full font-semibold">TWK / TIU / TKP</span>
+                    </div>
+                    <p id="teks-soal" class="text-gray-800 text-lg mb-6 leading-relaxed">
+                        Pertanyaan soal akan dimuat di sini...
+                    </p>
+
+                    <!-- Pilihan Jawaban (A-E) -->
+                    <div id="options-container" class="space-y-3">
+                        <!-- Digenerate dinamis -->
+                    </div>
+                </div>
+
+                <!-- Navigasi Bawah Soal -->
+                <div class="flex justify-between mt-8 pt-4 border-t">
+                    <button onclick="prevSoal()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-5 py-2 rounded-lg font-semibold transition">Sebelumnya</button>
+                    <button onclick="nextSoal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg font-semibold transition">Selanjutnya</button>
+                </div>
+            </div>
+
+            <!-- Navigasi Nomor Soal (Kanan - 1 Kolom) -->
+            <div class="bg-white p-4 rounded-xl shadow-md h-fit max-h-[520px] flex flex-col">
+                <h3 class="font-bold text-gray-700 mb-3 border-b pb-2">Navigasi Soal</h3>
+                <div id="nav-grid" class="grid grid-cols-5 gap-2 mb-6 overflow-y-auto p-1 max-h-[320px]"></div>
+                <div class="text-xs space-y-1 mb-4 text-gray-600 border-t pt-2">
+                    <div class="flex items-center gap-2"><span class="w-3 h-3 bg-emerald-600 inline-block rounded"></span> Sudah dijawab</div>
+                    <div class="flex items-center gap-2"><span class="w-3 h-3 bg-gray-200 border inline-block rounded"></span> Belum dijawab</div>
+                </div>
+                <button onclick="konfirmasiSelesai()" class="w-full bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-lg font-bold shadow transition">
+                    Selesai Ujian
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- HALAMAN HASIL UJIAN -->
+    <div id="halaman-hasil" class="hidden flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-lg text-center">
+            <h2 class="text-2xl font-bold text-emerald-900 mb-1">Hasil Simulasi Ujian</h2>
+            <p class="text-gray-500 text-sm mb-6">Laporan Evaluasi Kecepatan & Akurasi CAT BKN</p>
+            
+            <div class="bg-slate-50 p-4 rounded-xl text-left mb-6 space-y-2 border">
+                <p><strong>Nama Peserta:</strong> <span id="res-nama"></span></p>
+                <p><strong>Nomor Peserta:</strong> <span id="res-nomor"></span></p>
+                <hr>
+                <p><strong>Total Skor Akhir:</strong> <span id="res-skor" class="text-2xl font-extrabold text-emerald-600"></span></p>
+                <p><strong>Waktu Terpakai:</strong> <span id="res-waktu" class="font-semibold text-gray-700"></span></p>
+                <p class="pt-2"><strong>Status Evaluasi Tier:</strong><br><span id="res-status" class="text-base block mt-1"></span></p>
+            </div>
+
+            <button onclick="location.reload()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-2 rounded-lg transition shadow">
+                Ulangi Simulasi (Menu Utama)
+            </button>
+        </div>
+    </div>
+
+    <!-- SCRIPT LOGIKA APLIKASI & PAKET SOAL 17 -->
+    <script>
+        const daftarSoal = [
+            { 
+                id: 1, 
+                kategori: "TWK - Pilar Negara & Tata Negara", 
+                soal: "Berdasarkan UUD NRI Tahun 1945, lembaga negara yang memiliki wewenang untuk memeriksa pengelolaan dan tanggung jawab keuangan negara adalah...", 
+                opsi: ["Bank Indonesia (BI)", "Badan Pemeriksa Keuangan (BPK)", "Mahkamah Agung (MA)", "Komisi Pemberantasan Korupsi (KPK)", "Dewan Perwakilan Daerah (DPD)"], 
+                kunci: 1 
+            },
+            { 
+                id: 2, 
+                kategori: "TWK - Nasionalisme & Bela Negara", 
+                soal: "Wujud nyata nilai bela negara bagi seorang Aparatur Sipil Negara (ASN) dalam menjalankan tugas sehari-hari di kantor adalah...", 
+                opsi: ["Mengutamakan kepentingan pribadi atau golongan di atas kepentingan instansi.", "Melaksanakan pelayanan publik dengan jujur, transparan, cepat, dan penuh tanggung jawab.", "Menolak setiap kebijakan baru pimpinan karena merasa sudah nyaman dengan sistem lama.", "Bekerja hanya ketika diawasi langsung oleh pejabat struktural.", "Menghindari koordinasi lintas bidang agar beban kerja berkurang."], 
+                kunci: 1 
+            },
+            { 
+                id: 3, 
+                kategori: "TIU - Silogisme & Logika", 
+                soal: "Semua ilmuwan kimia memiliki ketelitian yang tinggi dalam bekerja. Sebagian praktisi laboratorium adalah ilmuwan kimia. Kesimpulan yang sah adalah...", 
+                opsi: ["Semua praktisi laboratorium memiliki ketelitian yang tinggi dalam bekerja.", "Sebagian praktisi laboratorium memiliki ketelitian yang tinggi dalam bekerja.", "Tidak ada praktisi laboratorium yang teliti.", "Semua yang memiliki ketelitian tinggi adalah praktisi laboratorium.", "Sebagian ilmuwan kimia bukan praktisi laboratorium."], 
+                kunci: 1 
+            },
+            { 
+                id: 4, 
+                kategori: "TIU - Aritmatika & Persentase", 
+                soal: "Harga sebuah laptop setelah mendapat diskon 20% adalah Rp4.800.000,00. Berapakah harga awal laptop tersebut sebelum diskon?", 
+                opsi: ["Rp5.500.000,00", "Rp5.760.000,00", "Rp6.000.000,00", "Rp6.200.000,00", "Rp6.500.000,00"], 
+                kunci: 2 
+            },
+            { 
+                id: 5, 
+                kategori: "TIU - Penalaran Analitis", 
+                soal: "Dalam sebuah barisan antrean pendaftaran pegawai, posisi berdiri 5 orang (P, Q, R, S, T) diatur sebagai berikut: P berdiri tepat di depan Q. R berdiri di belakang S. T berdiri di depan P, namun berada di belakang S. Urutan orang dari yang berada di barisan paling depan hingga paling belakang adalah...", 
+                opsi: ["S, T, P, Q, R", "T, S, P, Q, R", "S, R, T, P, Q", "P, Q, T, S, R", "T, P, Q, S, R"], 
+                kunci: 0 
+            },
+            { 
+                id: 6, 
+                kategori: "TIU - Perbandingan Senilai", 
+                soal: "Sebuah mesin pencetak dokumen di kantor mampu mencetak 180 lembar kertas dalam waktu 3 menit. Berapa waktu yang dibutuhkan mesin tersebut untuk mencetak 600 lembar kertas?", 
+                opsi: ["8 menit", "9 menit", "10 menit", "12 menit", "15 menit"], 
+                kunci: 2 
+            },
+            { 
+                id: 7, 
+                kategori: "TKP - Pelayanan Publik", 
+                soal: "Seorang warga datang ke instansi Anda untuk mengurus dokumen penting dengan membawa persyaratan yang belum lengkap karena salah informasi dari brosur lama. Sikap Anda sebagai ASN adalah...", 
+                opsi: ["Meminta warga tersebut langsung pulang tanpa penjelasan apa pun karena kesalahannya sendiri.", "Menjelaskan secara sabar kekurangan persyaratannya, memberikan panduan informasi yang valid, dan membantu memprioritaskan pelayanannya setelah syarat dilengkapi.", "Menyuruhnya menyogok petugas loket agar berkas langsung diproses.", "Mengabaikan warga tersebut dan melanjutkan istirahat siang.", "Menyalahkan instansi pembuat brosur lama di depan warga tersebut secara emosional."], 
+                bobot: [1, 5, 1, 1, 2] 
+            },
+            { 
+                id: 8, 
+                kategori: "TKP - Jejaring Kerja & Kolaborasi", 
+                soal: "Dalam sebuah tim kerja lintas bagian, terjadi perbedaan pendapat yang tajam antaranggota mengenai strategi penyelesaian proyek sehingga rapat menjadi jalan ditempat. Sikap Anda adalah...", 
+                opsi: ["Keluar dari rapat karena tidak ingin ikut campur dalam perdebatan.", "Mendengarkan argumen dari setiap pihak secara objektif, lalu menawarkan titik temu atau solusi kompromi yang mengakomodasi tujuan bersama.", "Mendukung rekan yang paling dekat dengan Anda tanpa peduli substansi masalah.", "Memaksakan ide pribadi Anda agar langsung disetujui seluruh anggota tim.", "Meminta atasan untuk membubarkan tim tersebut."], 
+                bobot: [1, 5, 2, 1, 1] 
+            },
+            { 
+                id: 9, 
+                kategori: "TKP - Integritas & Anti-Korupsi", 
+                soal: "Anda melihat seorang rekan kerja sering menggunakan fasilitas inventaris kantor (seperti printer dan kertas cetak) untuk keperluan bisnis percetakan pribadinya di luar jam kantor tanpa izin. Sikap Anda adalah...", 
+                opsi: ["Ikut memanfaatkan fasilitas tersebut untuk keuntungan pribadi Anda juga.", "Mengingatkan rekan tersebut secara baik-baik secara pribadi agar menghentikan perbuatannya karena menyalahgunakan aset negara.", "Membiarkannya karena bukan urusan dan wewenang Anda.", "Membagikan foto kegiatan tersebut ke grup WhatsApp kantor secara terbuka untuk mempermalukannya.", "Meminta bayaran komisi dari hasil bisnis pribadi rekan tersebut."], 
+                bobot: [1, 5, 2, 1, 1] 
+            },
+            { 
+                id: 10, 
+                kategori: "TKP - Adaptabilitas & Profesionalisme", 
+                soal: "Pemerintah pusat meluncurkan kebijakan transformasi digital baru yang mengubah total alur administrasi manual yang sudah Anda kuasai bertahun-tahun. Reaksi Anda adalah...", 
+                opsi: ["Menolak kebijakan baru dan tetap bersikeras menggunakan sistem manual lama.", "Mempelajari sistem digital baru dengan penuh semangat, beradaptasi dengan cepat, dan membimbing rekan kerja yang masih kesulitan.", "Menggunakan sistem digital hanya saat diawasi oleh pengawas instansi.", "Meminta staf lain untuk mengerjakan seluruh tugas digital Anda.", "Mengeluh secara terus-menerus kepada rekan kerja mengenai rumitnya sistem baru."], 
+                bobot: [1, 5, 2, 1, 1] 
+            }
+        ];
+
+        let peserta = { nama: "", nomor: "" };
+        let currentIndex = 0;
+        let jawabanUser = {}; 
+        
+        let totalWaktuAlokasi = 600; // Total 10 menit (600 detik)
+        let waktuSisa = 600; 
+        let intervalTimer;
+
+        function mulaiUjianApp() {
+            const nama = document.getElementById('input-nama').value.trim();
+            const nomor = document.getElementById('input-nomor').value.trim();
+
+            if (!nama || !nomor) {
+                alert("Mohon isi Nama Lengkap dan Nomor Peserta terlebih dahulu!");
+                return;
+            }
+
+            peserta.nama = nama;
+            peserta.nomor = nomor;
+
+            document.getElementById('info-peserta').innerText = `${nama} (${nomor})`;
+            document.getElementById('halaman-login').classList.add('hidden');
+            document.getElementById('halaman-ujian').classList.remove('hidden');
+
+            loadSoal();
+            mulaiTimer();
+        }
+
+        function mulaiTimer() {
+            const timerDisplay = document.getElementById('timer');
+            
+            intervalTimer = setInterval(() => {
+                let menit = Math.floor(waktuSisa / 60);
+                let detik = waktuSisa % 60;
+
+                timerDisplay.innerText = 
+                    (menit < 10 ? "0" + menit : menit) + ":" + 
+                    (detik < 10 ? "0" + detik : detik);
+
+                if (waktuSisa <= 0) {
+                    clearInterval(intervalTimer);
+                    alert("Waktu ujian telah habis!");
+                    selesaiUjian();
+                } else {
+                    waktuSisa--;
+                }
+            }, 1000);
+        }
+
+        function initNavigasi() {
+            const navGrid = document.getElementById('nav-grid');
+            navGrid.innerHTML = '';
+            daftarSoal.forEach((item, index) => {
+                let btn = document.createElement('button');
+                btn.innerText = index + 1;
+                let isTerisi = jawabanUser[index] !== undefined;
+                btn.className = `p-2 rounded-lg font-bold text-sm border transition ${
+                    isTerisi 
+                    ? 'bg-emerald-600 text-white border-emerald-600' 
+                    : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
+                }`;
+                btn.onclick = () => {
+                    currentIndex = index;
+                    loadSoal();
+                };
+                navGrid.appendChild(btn);
+            });
+        }
+
+        function loadSoal() {
+            const soal = daftarSoal[currentIndex];
+            document.getElementById('nomor-soal').innerText = `Soal No. ${currentIndex + 1} dari ${daftarSoal.length}`;
+            document.getElementById('kategori-soal').innerText = soal.kategori;
+            document.getElementById('teks-soal').innerText = soal.soal;
+
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            soal.opsi.forEach((opsiText, i) => {
+                let isChecked = jawabanUser[currentIndex] === i ? 'checked' : '';
+                let div = document.createElement('label');
+                div.className = `flex items-center p-3 border rounded-lg cursor-pointer transition ${isChecked ? 'border-emerald-600 bg-emerald-50' : 'border-gray-200 hover:bg-gray-50'}`;
+                div.innerHTML = `
+                    <input type="radio" name="jawaban" value="${i}" ${isChecked} onclick="pilihJawaban(${i})" class="mr-3 text-emerald-600 h-4 w-4">
+                    <span class="text-gray-700 font-medium">${String.fromCharCode(65 + i)}. ${opsiText}</span>
+                `;
+                optionsContainer.appendChild(div);
+            });
+            initNavigasi();
+        }
+
+        function pilihJawaban(i) {
+            jawabanUser[currentIndex] = i;
+            initNavigasi();
+        }
+
+        function nextSoal() {
+            if (currentIndex < daftarSoal.length - 1) {
+                currentIndex++;
+                loadSoal();
+            }
+        }
+
+        function prevSoal() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                loadSoal();
+            }
+        }
+
+        function konfirmasiSelesai() {
+            let jumlahTerisi = Object.keys(jawabanUser).length;
+            let jumlahKosong = daftarSoal.length - jumlahTerisi;
+
+            let konfirm = confirm(`Konfirmasi Selesai Ujian:\n- Soal Terjawab: ${jumlahTerisi}\n- Belum Terjawab: ${jumlahKosong}\n\nYakin akhiri sesi sekarang?`);
+            if (konfirm) {
+                clearInterval(intervalTimer);
+                selesaiUjian();
+            }
+        }
+
+        function selesaiUjian() {
+            let detikTerpakai = totalWaktuAlokasi - waktuSisa;
+            let menitRil = Math.floor(detikTerpakai / 60);
+            let detikRil = detikTerpakai % 60;
+            let formatWaktuRil = `${menitRil} menit ${detikRil} detik`;
+
+            let totalSkor = 0;
+            daftarSoal.forEach((item, index) => {
+                let ans = jawabanUser[index];
+                if (ans !== undefined) {
+                    if (item.bobot) {
+                        totalSkor += item.bobot[ans];
+                    } else {
+                        if (ans === item.kunci) {
+                            totalSkor += 5;
+                        }
+                    }
+                }
+            });
+
+            document.getElementById('halaman-ujian').classList.add('hidden');
+            document.getElementById('halaman-hasil').classList.remove('hidden');
+
+            document.getElementById('res-nama').innerText = peserta.nama;
+            document.getElementById('res-nomor').innerText = peserta.nomor;
+            document.getElementById('res-skor').innerText = totalSkor;
+            document.getElementById('res-waktu').innerText = formatWaktuRil;
+
+            let statusEl = document.getElementById('res-status');
+
+            // Logika Evaluasi Tier SANG PNS
+            if (detikTerpakai <= 300 && totalSkor >= 35) {
+                statusEl.innerHTML = "<span class='font-bold text-emerald-600'>Tier 3 (Master SANG PNS - Elite Level)</span><br><span class='text-xs text-gray-600'>Sangat luar biasa! Kecepatan waktu dan akurasi skor Anda sudah memenuhi standar kelulusan tertinggi CAT BKN.</span>";
+            } else if (detikTerpakai <= 420 || totalSkor >= 25) {
+                statusEl.innerHTML = "<span class='font-bold text-yellow-600'>Tier 2 (Pejuang Tangguh - Intermediate)</span><br><span class='text-xs text-gray-600'>Performa cukup baik, pertajam lagi ketelitian dan kecepatan pengerjaan untuk mengunci posisi aman.</span>";
+            } else {
+                statusEl.innerHTML = "<span class='font-bold text-red-600'>Tier 1 (Mahasiswa Abadi - Beginner)</span><br><span class='text-xs text-gray-600'>Waktu pengerjaan terlalu lambat atau skor masih di bawah target. Perbanyak latihan secara rutin!</span>";
+            }
+        }
+    </script>
+</body>
+</html>

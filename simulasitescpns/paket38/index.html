@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paket Soal Latihan Kompetensi V10 - Interaktif</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            background-color: #0b1329;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            padding: 20px;
+        }
+        .presentation-container {
+            position: relative;
+            width: 1280px;
+            height: 720px;
+            background-color: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 25px 40px -10px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 45px 55px;
+        }
+        .slide {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+        }
+        .slide.active {
+            display: flex;
+        }
+        h1, h2, h3 {
+            color: #0f172a;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            margin: 0;
+        }
+        p, li {
+            color: #334155;
+            font-size: 15px;
+            line-height: 1.45;
+            margin: 0;
+        }
+        .slide-title {
+            font-size: 28px;
+            margin-bottom: 18px;
+            width: 100%;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+            color: #1e3a8a;
+        }
+        .content-area {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            justify-content: flex-start;
+            width: 100%;
+        }
+        .title-layout {
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+        }
+        .title-layout h1 {
+            font-size: 50px;
+            color: #1e3a8a;
+            margin-bottom: 16px;
+        }
+        .title-layout .subtitle {
+            font-size: 19px;
+            color: #64748b;
+            max-width: 780px;
+        }
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+            width: 100%;
+            height: 100%;
+        }
+        .question-box {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-left: 5px solid #2563eb;
+            border-radius: 8px;
+            padding: 18px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
+        .question-text {
+            font-weight: 600;
+            color: #0f172a;
+            font-size: 15px;
+            margin-bottom: 10px;
+        }
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .options-list li {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 13.5px;
+        }
+        .options-list li.correct {
+            background-color: #e0f2fe;
+            border-color: #0284c7;
+            color: #0369a1;
+            font-weight: 600;
+        }
+        .badge {
+            background-color: #2563eb;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 6px;
+        }
+        .nav-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+        .nav-btn {
+            background-color: #1e3a8a;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .nav-btn:hover { background-color: #1d4ed8; }
+        .nav-btn:disabled { background-color: #94a3b8; cursor: not-allowed; }
+        .slide-counter {
+            font-weight: 600;
+            color: #475569;
+            font-size: 15px;
+        }
+        .qa-layout {
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+        }
+        .qa-layout h2 {
+            font-size: 55px;
+            color: #1e3a8a;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="presentation-container">
+
+    <!-- Slide 1: Title -->
+    <div class="slide active" id="slide-1">
+        <div class="content-area title-layout">
+            <span class="badge" style="font-size: 15px; padding: 6px 16px;">PAKET UTAMA - VERSI 10 FINAL</span>
+            <h1>Evaluasi Kompetensi Komprehensif (30 Butir)</h1>
+            <p class="subtitle">Edisi latihan soal terkini dengan fitur navigasi interaktif untuk menguji penalaran analitis, tata negara, ekonomi, sains, dan literasi modern.</p>
+        </div>
+    </div>
+
+    <!-- Slide 2: Soal 1 & 2 -->
+    <div class="slide" id="slide-2">
+        <h2 class="slide-title">Tata Negara &amp; Kebijakan Fiskal (Soal 1 - 2)</h2>
+        <div class="content-area">
+            <div class="two-column">
+                <div class="question-box">
+                    <div>
+                        <span class="badge">Soal 1</span>
+                        <div class="question-text">Penerapan konsep desentralisasi fiskal bertujuan utama untuk memberikan kewenangan kepada daerah dalam...</div>
+                        <ul class="options-list">
+                            <li>A. Mencetak mata uang sendiri secara independen.</li>
+                            <li class="correct">B. Mengelola pendapatan dan alokasi belanja daerah secara mandiri sesuai prioritas lokal.</li>
+                            <li>C. Menghapuskan seluruh pajak pusat di wilayah otonom.</li>
+                            <li>D. Menentukan kebijakan pertahanan dan keamanan nasional wilayah.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="question-box">
+                    <div>
+                        <span class="badge">Soal 2</span>
+                        <div class="question-text">Ketika pemerintah menjalankan kebijakan ekspansif melalui peningkatan belanja infrastruktur dan pemotongan pajak, tujuan utamanya adalah...</div>
+                        <ul class="options-list">
+                            <li>A. Menekan laju inflasi yang terlalu tinggi.</li>
+                            <li class="correct">B. Mendorong pertumbuhan ekonomi dan meningkatkan daya beli agregat masyarakat.</li>
+                            <li>C. Memperkecil peredaran uang di sektor riil.</li>
+                            <li>D. Menghapus defisit anggaran secara instan.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3: Soal 3 & 4 -->
+    <div class="slide" id="slide-3">
+        <h2 class="slide-title">Literasi Sastra &amp; Sains Lingkungan (Soal 3 - 4)</h2>
+        <div class="content-area">
+            <div class="two-column">
+                <div class="question-box">
+                    <div>
+                        <span class="badge">Soal 3</span>
+                        <div class="question-text">Majas yang melukiskan suatu peristiwa atau keadaan dengan menggunakan ungkapan yang bertentangan secara ekstrem disebut...</div>
+                        <ul class="options-list">
+                            <li>A. Simile</li>
+                            <li>B. Metonimia</li>
+                            <li class="correct">C. Oksimoron / Paradoks</li>
+                            <li>D. Personifikasi</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="question-box">
+                    <div>
+                        <span class="badge">Soal 4</span>
+                        <div class="question-text">Fenomena pemutihan karang (coral bleaching) di ekosistem terumbu karang utamanya dipicu oleh kenaikan suhu air laut yang menyebabkan...</div>
+                        <ul class="options-list">
+                            <li class="correct">A. Hilangnya alga simbiotik (zooxanthellae) penyedia nutrisi karang.</li>
+                            <li>B. Masuknya endapan lumpur vulkanik secara masif.</li>
+                            <li>C. Ledakan populasi ikan pemangsa karang.</li>
+                            <li>D. Penurunan kadar garam secara drastis dalam waktu singkat.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 4: Soal 5 & 6 -->
+    <div class="slide" id="slide-4">
+        <h2 class="slide-title">Sains Terapan &amp; Manajemen Publik (Soal 5 - 6)</h2>
+        <div class="content-area">
+            <div class="two-column">
+                <div class="question-box">
+                    <div>
+                        <span class="badge">Soal 5</span>
+                        <div class="question-text">Dalam teknologi transmisi data optik, komponen utama yang mengubah sinyal listrik menjadi pulsa cahaya adalah...</div>
+                        <ul class="options-list">
+                            <li>A. Fotodetektor</li>
+                            <li class="correct">B. Dioda Laser / LED (Light Emitting Diode)</li>
+                            <li>C. Trafo step-down</li>
+                            <li>D. Kapasitor elektrolit</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="question-box">
+                    <div>
+                        <span class="badge">Soal 6</span>
+                        <div class="question-text">Dalam kerangka manajemen risiko organisasi, langkah pertama yang wajib dilakukan sebelum menentukan tindakan mitigasi adalah...</div>
+                        <ul class="options-list">
+                            <li>A. Mengalokasikan seluruh dana cadangan untuk asuransi.</li>
+                            <li class="correct">B. Identifikasi dan analisis potensi risiko yang mungkin terjadi.</li>
+                            <li>C. Membubarkan divisi operasional yang rawan masalah.</li>
+                            <li>D. Menunggu hingga kerugian finansial benar-benar terjadi.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: Soal 7 & 8 -->
+    <div class="slide" id="slide-5">
+        <h2 class="slide-title">Kebahasaan &amp; Teori Organisasi (Soal 7 - 8)</h2>
+        <div class="content-area">
+            <div class="two-column">
+                <div class="question-box">
+                    <div>
+                        <span class="badge">Soal 7</span>
+                        <div class="question-text">Penulisan unsur serapan asing yang paling sesuai dengan kaidah bahasa Indonesia yang baku adalah...</div>
+                        <ul class="options-list">
+                            <li>A. Analisa, aktifitas, kwalitas</li>
+                            <li class="correct">B. Analisis, aktivitas, kualitas</li>
+                            <li>C. Analize, aktifity, quality</li>
+                            <li>D. Analisa, aktifitas, kwalitet</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="question-box">
+                    <div>
+                        <span class="badge">Soal 8</span>
+                        <div class="question-text">Gaya kepemimpinan transformasional dalam birokrasi publik dicirikan oleh kemampuan pemimpin untuk...</div>
+                        <ul class="options-list">
+                            <li>A. Menuntut kepatuhan mutlak tanpa ruang diskusi bawahannya.</li>
+                            <li class="correct">B. Menginspirasi, memotivasi, dan mendorong inovasi serta pengembangan diri pegawai.</li>
+                            <li>C. Menyerahkan seluruh tanggung jawab strategis kepada pihak eksternal.</li>
+                            <li>D. Menghindari segala bentuk perubahan struktur organisasi.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 6: Soal 9 & 10 -->
+    <div class="slide" id="slide-6">
+        <h2 class="slide-title">Numerik &amp; Biologi Molekuler (Soal 9 - 10)</h2>
+        <div class="content-area">
+            <div class="two-column">
+                <div class="question-box">
+                    <div>
+                        <span class="badge">Soal 9</span>
+                        <div class="question-text">Sebuah proyek dikerjakan oleh 12 orang pekerja selama 15 hari. Jika 4 orang pekerja berhalangan hadir, berapa hari tambahan waktu yang dibutuhkan?</div>
+                        <ul class="options-list">
+                            <li>A. 2 hari</li>
+                            <li class="correct">B. 7,5 hari tambahan (total 22,5 hari)</li>
+                            <li>C. 5 hari</li>
+                            <li>D. 10 hari</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="question-box">
+                    <div>
+                        <span class="badge">Soal 10</span>
+                        <div class="question-text">Proses transkripsi dalam sintesis protein terjadi di dalam bagian sel...</div>
+                        <ul class="options-list">
+                            <li class="correct">A. Inti sel (Nukleus)</li>
+                            <li>B. Ribosom sitoplasma</li>
+                            <li>C. Membran sel</li>
+                            <li>D. Kompleks Golgi</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 7: Soal 11 & 12 -->
+    <div class="slide" id="slide-7">
+        <h2 class="slide-title">Ekologi &amp; Etika Birokrasi (Soal 11 - 12)</h2>
+        <div class="content-area">
+            <div class="two-column">
+                <div class="question-box">
+                    <div>
+                        <span class="badge">Soal 11</span>
+                        <div class="question-text">Hubungan timbal balik antara bunga anggrek yang menempel pada pohon tinggi tanpa merugikan pohon inangnya disebut simbiosis...</div>
+                        <ul class="options-list">
+                            <li>A. Mutualisme</li>
+                            <li class="correct">B. Komensalisme</li>
+                            <li>C. Parasitisme</li>
+                            <li>D. Amensalisme</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="question-box">
+                    <div>
+                        <span class="badge">Soal 12</span>
+                        <div class="question-text">Dalam kode etik ASN, nilai "Akuntabel" diwujudkan secara nyata melalui perilaku...</div>
+                        <ul class="options-list">
+                            <li class="correct">A. Melaksanakan tugas dengan jujur, bertanggung jawab, cermat, serta menggunakan kekayaan negara secara efektif dan efisien.</li>
+                            <li>B. Membagikan informasi rahasia instansi demi popularitas media sosial.</li>
+                            <li>C. Menunda penyelesaian pekerjaan hingga batas tenggat waktu.</li>
+                            <li>D. Menerima fasilitas khusus dari pihak luar untuk mempercepat layanan.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 8: Soal 13 & 14 -->
+    <div class="slide" id="slide-8">
+        <h2 class="slide-title">Kosakata &amp; Tata Bahasa (Soal 13 - 14)</h2>
+        <div class="content-area">
+            <div class="two-column">
+                <div class="question-box">
+                    <div>
+                        <span class="badge">Soal 13</span>
+                        <div class="question-text">Sinonim dari kata "Kandungan" atau muatan substansial dalam konteks informasi ilmiah adalah...</div>
+                        <ul class="options-list">
+                            <li>A. Bungkus</li>
+                            <li class="correct">B. Substansi / Esensi</li>
+                            <li>C. Siluet</li>
+                            <li>D. Garis besar ringkas</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="question-box">
+                    <div>
+                        <span class="badge">Soal 14</span>
+                        <div class="question-text">Antonim dari kata "Konvergensi" (menuju satu titik temu) adalah...</div>
+                        <ul class="options-list">
+                            <li>A. Integrasi</li>
+                            <li class="correct">B. Divergensi (menyebar / memencar)</li>
+                            <li>C. Sentralisasi</li>
+                            <li>D. Kolaborasi</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 9: Soal 15 & 16 -->
+    <div class="slide" id="slide-9">
+        <h2 class="slide-title">Aritmatika Finansial &amp; Sastra (Soal 15 - 16)</h2>
+        <div class="content-area">
+            <div class="two-column">
+                <div class="question-box">
+                    <div>
+                        <span class="badge">Soal 15</span>
+                        <div class="question-text">Modal sebesar Rp5.000.000 diinvestasikan dengan suku bunga tunggal 12% per tahun. Berapa total uang setelah 9 bulan?</div>
+                        <ul class="options-list">
+                            <li>A. Rp5.300.000</li>
+                            <li class="correct">B. Rp5.450.000</li>
+                            <li>C. Rp5.600.000</li>
+                            <li>D. Rp5.750.000</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="question-box">
+                    <div>
+                        <span class="badge">Soal 16</span>
+                        <div class="question-text">Sudut pandang pengarang yang menempatkan diri sebagai pencerita serbatahu yang mengetahui isi hati seluruh tokoh disebut...</div>
+                        <ul class="options-list">
+                            <li class="correct">A. Orang ketiga serbatahu (omniscient)</li>
+                            <li>B. Orang pertama pelaku utama</li>
+                            <li>C. Orang ketiga pengamat terbatas</li>
+                            <li>D. Orang kedua interaktif</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 10: Soal 17 & 18 -->
+    <div class="slide" id="slide-10">
+        <h2 class="slide-title">Wawasan Kebangsaan Lanjutan (Soal 17 - 18)</h2>
+        <div class="content-area">
+            <div class="two-column">
+                <div class="question-box">
+                    <div>
+                        <span class="badge">Soal 17</span>
+                        <div class="question-text">Pengamalan Sila ke-3 Pancasila ("Persatuan Indonesia") dalam kehidupan bernegara tercermin melalui sikap...</div>
+                        <ul class="options-list">
+                            <li class="correct">A. Menempatkan persatuan, kesatuan, serta kepentingan bangsa di atas kepentingan pribadi atau golongan.</li>
+                            <li>B. Membentuk kelompok eksklusif berdasarkan kesamaan kedaerahan sempit.</li>
+                            <li>C. Mengutamakan hasil voting mayoritas mutlak tanpa dialog kelompok minoritas.</li>
+                            <li>D. Menolak kerja sama ekonomi dengan negara-negara tetangga.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="question-box">
+                    <div>
+                        <span class="badge">Soal 18</span>
+                        <div class="question-text">Berdasarkan UUD 1945, kekuasaan kehakiman di Indonesia dilakukan oleh...</div>
+                        <ul class="options-list">
+                            <li>A. Kepolisian Negara Republik Indonesia dan Kejaksaan Agung</li>
+                            <li class="correct">B. Mahkamah Agung dan badan peradilan di bawahnya serta Mahkamah Konstitusi</li>
+                            <li>C. Majelis Permusyawaratan Rakyat dan Dewan Perwakilan Rakyat</li>
+                            <li>D. Presiden bersama para menteri kabinet</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 11: Soal 19 & 20 -->
+    <div class="slide" id="slide-11">
+        <h2 class="slide-title">Sejarah Kebangsaan &amp; Bela Negara (Soal 19 - 20)</h2>
+        <div class="content-area">
+            <div class="two-column">
+                <div class="question-box">
+                    <div>
+                        <span class="badge">Soal 19</span>
+                        <div class="question-text">Hasil sidang PPKI tanggal 19 Agustus 1945 memutuskan pembagian wilayah Republik Indonesia menjadi...</div>
+                        <ul class="options-list">
+                            <li class="correct">A. Delapan provinsi beserta penunjukan gubernurnya</li>
+                            <li>B. Tiga wilayah militer besar</li>
+                            <li>C. Dua puluh tujuh daerah keresidenan otonom</li>
+                            <li>D. Sistem federal dengan empat negara bagian</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="question-box">
+                    <div>
+                        <span class="badge">Soal 20</span>
+                        <div class="question-text">Wujud partisipasi warga negara dalam upaya bela negara non-militer di era digital saat ini antara lain adalah...</div>
+                        <ul class="options-list">
+                            <li class="correct">A. Meningkatkan literasi digital, menjaga kedaulatan data siber, dan memerangi disinformasi/hoaks.</li>
+                            <li>B. Membeli persenjataan berat untuk keamanan lingkungan rumah.</li>
+                            <li>C. Menutup seluruh akses jaringan internet nasional.</li>
+                            <li>D. Mengisolasi diri dari perkembangan teknologi global.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 12: Soal 21 & 22 -->
+    <div class="slide" id="slide-12">
+        <h2 class="slide-title">Penalaran Situasional &amp; Ekonomi (Soal 21 - 22)</h2>
+        <div class="content-area">
+            <div class="two-column">
+                <div class="question-box">
+                    <div>
+                        <span class="badge">Soal 21</span>
+                        <div class="question-text">Anda mendapati dokumen rahasia instansi tersimpan di area publik kantor. Tindakan paling tepat sesuai integritas adalah...</div>
+                        <ul class="options-list">
+                            <li>A. Membiarkannya karena bukan urusan divisi Anda.</li>
+                            <li class="correct">B. Mengamankan dokumen tersebut segera dan melaporkannya kepada atasan atau unit pengelola pengamanan data.</li>
+                            <li>C. Memfoto dan membagikannya ke grup percakapan pribadi.</li>
+                            <li>D. Menyimpan dokumen tersebut di meja pribadi tanpa konfirmasi.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="question-box">
+                    <div>
+                        <span class="badge">Soal 22</span>
+                        <div class="question-text">Instrumen investasi pasar modal berupa surat utang berjangka menengah-panjang yang diterbitkan oleh perusahaan swasta disebut...</div>
+                        <ul class="options-list">
+                            <li>A. Saham preferen</li>
+                            <li class="correct">B. Obligasi korporasi</li>
+                            <li>C. Surat Berharga Syariah Negara</li>
+                            <li>D. Reksadana pasar uang</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 13: Soal 23 & 24 -->
+    <div class="slide" id="slide-13">
+        <h2 class="slide-title">Geografi &amp; Tata Bahasa Kalimat (Soal 23 - 24)</h2>
+        <div class="content-area">
+            <div class="two-column">
+                <div class="question-box">
+                    <div>
+                        <span class="badge">Soal 23</span>
+                        <div class="question-text">Garis khayal yang memisahkan fauna wilayah Wallacea dengan wilayah Papua dan Kepulauan Aru (Australis) adalah...</div>
+                        <ul class="options-list">
+                            <li>A. Garis Wallace</li>
+                            <li class="correct">B. Garis Weber</li>
+                            <li>C. Garis Equator</li>
+                            <li>D. Garis Meridian</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="question-box">
+                    <div>
+                        <span class="badge">Soal 24</span>
+                        <div class="question-text">Dalam kalimat <em>"Direktur menandatangani nota kesepahaman di ruang rapat utama kemarin."</em>, unsur Objek (O) adalah...</div>
+                        <ul class="options-list">
+                            <li>A. Direktur</li>
+                            <li>B. menandatangani</li>
+                            <li class="correct">C. nota kesepahaman</li>
+                            <li>D. di ruang rapat utama kemarin</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 14: Soal 25 & 26 -->
+    <div class="slide" id="slide-14">
+        <h2 class="slide-title">Ekonomi Internasional &amp; Pembelajaran (Soal 25 - 26)</h2>
+        <div class="content-area">
+            <div class="two-column">
+                <div class="question-box">
+                    <div>
+                        <span class="badge">Soal 25</span>
+                        <div class="question-text">Kebijakan menjual barang di pasar luar negeri dengan harga yang lebih murah daripada di dalam negeri disebut...</div>
+                        <ul class="options-list">
+                            <li>A. Proteksionisme murni</li>
+                            <li class="correct">B. Dumping</li>
+                            <li>C. Kuota impor</li>
+                            <li>D. Subsidi silang domestik</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="question-box">
+                    <div>
+                        <span class="badge">Soal 26</span>
+                        <div class="question-text">Kerangka pembelajaran mendalam (Deep Learning) menekankan pengalaman belajar yang berpusat pada tiga pilar utama, yaitu...</div>
+                        <ul class="options-list">
+                            <li class="correct">A. Mindful, Meaningful, dan Joyful Learning</li>
+                            <li>B. Hafalan mekanis, kecepatan tulis, dan tes tertulis</li>
+                            <li>C. Kehadiran fisik, absensi digital, dan ujian lisan</li>
+                            <li>D. Teori kaku, doktrinasi, dan tanpa refleksi</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 15: Soal 27 & 28 -->
+    <div class="slide" id="slide-15">
+        <h2 class="slide-title">Akuntansi Dasar &amp; SPBE (Soal 27 - 28)</h2>
+        <div class="content-area">
+            <div class="two-column">
+                <div class="question-box">
+                    <div>
+                        <span class="badge">Soal 27</span>
+                        <div class="question-text">Dalam siklus akuntansi perusahaan, pencatatan transaksi yang mengakibatkan bertambahnya liabilitas dicatat di sisi...</div>
+                        <ul class="options-list">
+                            <li>A. Debet (D)</li>
+                            <li class="correct">B. Kredit (K)</li>
+                            <li>C. Saldo laba bersih</li>
+                            <li>D. Aktiva lancar</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="question-box">
+                    <div>
+                        <span class="badge">Soal 28</span>
+                        <div class="question-text">Pusat data nasional dalam arsitektur Sistem Pemerintahan Berbasis Elektronik (SPBE) berfungsi utama untuk...</div>
+                        <ul class="options-list">
+                            <li class="correct">A. Mewujudkan keterpaduan penyimpanan, pengelolaan, dan keamanan data instansi pemerintah secara terpusat.</li>
+                            <li>B. Membatasi komunikasi antarlembaga negara agar independen.</li>
+                            <li>C. Menghapuskan seluruh server lokal tanpa backup.</li>
+                            <li>D. Menyediakan akses komersial terbuka bagi publik umum.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 16: Soal 29 & 30 -->
+    <div class="slide" id="slide-16">
+        <h2 class="slide-title">Demokrasi &amp; Kohesi Sosial (Soal 29 - 30)</h2>
+        <div class="content-area">
+            <div class="two-column">
+                <div class="question-box">
+                    <div>
+                        <span class="badge">Soal 29</span>
+                        <div class="question-text">Esensi utama dari permusyawaratan perwakilan dalam sistem demokrasi Pancasila adalah tercapainya keputusan yang dilandasi oleh...</div>
+                        <ul class="options-list">
+                            <li>A. Paksaan suara mayoritas kelompok dominan.</li>
+                            <li class="correct">B. Semangat kekeluargaan, musyawarah mufakat, serta pertimbangan akal sehat dan hati nurani.</li>
+                            <li>C. Keputusan mutlak satu orang pemimpin tertinggi rapat.</li>
+                            <li>D. Voting tertutup tanpa ruang dialog gagasan.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="question-box">
+                    <div>
+                        <span class="badge">Soal 30</span>
+                        <div class="question-text">Dalam masyarakat multikultural seperti Indonesia, kunci utama dalam merawat kerukunan dan kohesi sosial adalah...</div>
+                        <ul class="options-list">
+                            <li>A. Mengisolasi kelompok mayoritas dari minoritas.</li>
+                            <li class="correct">B. Mengembangkan sikap toleransi aktif, inklusivitas, dan saling menghormati dalam bingkai hukum.</li>
+                            <li>C. Menyeragamkan seluruh adat istiadat daerah menjadi satu budaya nasional.</li>
+                            <li>D. Menghindari segala bentuk dialog antarbudaya.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 17: Outro / Q&A -->
+    <div class="slide" id="slide-17">
+        <div class="content-area qa-layout">
+            <h2>Selesai!</h2>
+            <p style="font-size: 20px; color: #475569;">Seluruh 30 butir soal latihan versi 10 telah disajikan dengan struktur interaktif penuh.</p>
+            <div style="margin-top: 35px; font-weight: 600; color: #1e3a8a; font-size: 18px;">
+                Semoga Paket Soal Alternatif Versi 10 Ini Sukses Mendukung Pengujian Kompetensi Anda!
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Footer Controls -->
+    <div class="nav-footer">
+        <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)"><i class="fas fa-arrow-left"></i> Sebelumnya</button>
+        <span class="slide-counter" id="slideIndicator">Slide 1 dari 17</span>
+        <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">Berikutnya <i class="fas fa-arrow-right"></i></button>
+    </div>
+
+</div>
+
+<script>
+    let currentSlide = 1;
+    const totalSlides = 17;
+
+    function updateSlideView() {
+        // Hide all slides
+        for (let i = 1; i <= totalSlides; i++) {
+            document.getElementById(`slide-${i}`).classList.remove('active');
+        }
+        // Show current slide
+        document.getElementById(`slide-${currentSlide}`).classList.add('active');
+        
+        // Update indicator text
+        document.getElementById('slideIndicator').innerText = `Slide ${currentSlide} dari ${totalSlides}`;
+        
+        // Update button states
+        document.getElementById('prevBtn').disabled = currentSlide === 1;
+        document.getElementById('nextBtn').disabled = currentSlide === totalSlides;
+    }
+
+    function changeSlide(direction) {
+        currentSlide += direction;
+        if (currentSlide < 1) currentSlide = 1;
+        if (currentSlide > totalSlides) currentSlide = totalSlides;
+        updateSlideView();
+    }
+
+    // Keyboard support (Arrow Left / Right)
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') {
+            if (currentSlide < totalSlides) changeSlide(1);
+        } else if (e.key === 'ArrowLeft') {
+            if (currentSlide > 1) changeSlide(-1);
+        }
+    });
+
+    // Initialize initial state
+    updateSlideView();
+</script>
+
+</body>
+</html>
+```eof
+
+### Catatan Pembaruan pada Versi 10:
+* **Interaktivitas Penuh:** Dilengkapi dengan tombol navigasi `Sebelumnya` dan `Berikutnya` serta indikator halaman yang aktif secara *real-time*.
+* **Navigasi Keyboard:** Anda dapat menggunakan tombol panah keyboard (`←` dan `→`) untuk berpindah antar slide dengan mudah layaknya presentasi profesional.
+* **Perbaikan Struktur:** Mengeliminasi error tampilan dengan mengisolasi setiap slide ke dalam *container* terpisah yang dikontrol melalui skrip bersih tanpa konflik gaya CSS.

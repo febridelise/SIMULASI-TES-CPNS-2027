@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SANG PNS - Simulasi CAT SKD CPNS (Tier 2 - Paket 3)</title>
+    <!-- Tailwind CSS v3 CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 font-sans">
+
+    <!-- HALAMAN LOGIN / REGISTRASI PESERTA -->
+    <div id="halaman-login" class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
+            <div class="text-center mb-6">
+                <span class="bg-teal-100 text-teal-800 text-xs font-semibold px-3 py-1 rounded-full">SANG PNS - TIER 2 (PAKET 3 - 20 SOAL)</span>
+                <h2 class="text-2xl font-bold text-teal-900 mt-2">Simulasi CAT SKD CPNS</h2>
+                <p class="text-gray-500 text-sm mt-1">Waktu Ujian: 18 Menit | Standar Asli BKN</p>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Lengkap</label>
+                    <input type="text" id="input-nama" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-600" placeholder="Contoh: Febri Delise">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Nomor Peserta / NIK</label>
+                    <input type="text" id="input-nomor" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-600" placeholder="Contoh: 610012345678">
+                </div>
+                <button onclick="mulaiUjianApp()" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-lg transition shadow-md">
+                    Mulai Ujian Tier 2 - Paket 3
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HALAMAN UTAMA UJIAN -->
+    <div id="halaman-ujian" class="hidden">
+        <header class="bg-teal-900 text-white p-4 shadow-md flex justify-between items-center">
+            <div>
+                <h1 class="text-lg font-bold">CAT BKN - Seleksi Kompetensi Dasar (SKD) Tier 2</h1>
+                <p id="info-peserta" class="text-xs text-teal-200"></p>
+            </div>
+            <div id="timer" class="bg-red-600 px-4 py-2 rounded-lg font-mono font-bold text-lg shadow-inner">
+                18:00
+            </div>
+        </header>
+
+        <main class="max-w-6xl mx-auto p-4 grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+            <!-- Bagian Soal (Kiri - 3 Kolom) -->
+            <div class="md:col-span-3 bg-white p-6 rounded-xl shadow-md flex flex-col justify-between min-h-[480px]">
+                <div>
+                    <div class="flex justify-between items-center border-b pb-3 mb-4">
+                        <span id="nomor-soal" class="font-bold text-lg text-teal-900">Soal No. 1</span>
+                        <span id="kategori-soal" class="text-sm bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full font-semibold">TWK / TIU / TKP</span>
+                    </div>
+                    <p id="teks-soal" class="text-gray-800 text-lg mb-6 leading-relaxed">
+                        Pertanyaan soal akan dimuat di sini...
+                    </p>
+
+                    <!-- Pilihan Jawaban (A-E) -->
+                    <div id="options-container" class="space-y-3">
+                        <!-- Digenerate dinamis -->
+                    </div>
+                </div>
+
+                <!-- Navigasi Bawah Soal -->
+                <div class="flex justify-between mt-8 pt-4 border-t">
+                    <button onclick="prevSoal()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-5 py-2 rounded-lg font-semibold transition">Sebelumnya</button>
+                    <button onclick="nextSoal()" class="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2 rounded-lg font-semibold transition">Selanjutnya</button>
+                </div>
+            </div>
+
+            <!-- Navigasi Nomor Soal (Kanan - 1 Kolom) -->
+            <div class="bg-white p-4 rounded-xl shadow-md h-fit max-h-[520px] flex flex-col">
+                <h3 class="font-bold text-gray-700 mb-3 border-b pb-2">Navigasi Soal (1 - 20)</h3>
+                <div id="nav-grid" class="grid grid-cols-4 gap-2 mb-6 overflow-y-auto p-1 max-h-[320px]"></div>
+                <div class="text-xs space-y-1 mb-4 text-gray-600 border-t pt-2">
+                    <div class="flex items-center gap-2"><span class="w-3 h-3 bg-teal-600 inline-block rounded"></span> Sudah dijawab</div>
+                    <div class="flex items-center gap-2"><span class="w-3 h-3 bg-gray-200 border inline-block rounded"></span> Belum dijawab</div>
+                </div>
+                <button onclick="konfirmasiSelesai()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-lg font-bold shadow transition">
+                    Selesai Ujian
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- HALAMAN HASIL UJIAN -->
+    <div id="halaman-hasil" class="hidden flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-lg text-center">
+            <h2 class="text-2xl font-bold text-teal-900 mb-1">Hasil Evaluasi Tier 2 - Paket 3</h2>
+            <p class="text-gray-500 text-sm mb-6">Laporan Uji Kecepatan & Akurasi CAT BKN (20 Soal)</p>
+            
+            <div class="bg-slate-50 p-4 rounded-xl text-left mb-6 space-y-2 border">
+                <p><strong>Nama Peserta:</strong> <span id="res-nama"></span></p>
+                <p><strong>Nomor Peserta:</strong> <span id="res-nomor"></span></p>
+                <hr>
+                <p><strong>Total Skor Akhir:</strong> <span id="res-skor" class="text-2xl font-extrabold text-teal-600"></span></p>
+                <p><strong>Waktu Terpakai:</strong> <span id="res-waktu" class="font-semibold text-gray-700"></span></p>
+                <p class="pt-2"><strong>Status Evaluasi Tier 2:</strong><br><span id="res-status" class="text-base block mt-1"></span></p>
+            </div>
+
+            <button onclick="location.reload()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold px-6 py-2 rounded-lg transition shadow">
+                Ulangi Simulasi (Menu Utama)
+            </button>
+        </div>
+    </div>
+
+    <!-- SCRIPT LOGIKA APLIKASI & 20 SOAL TIER 2 PAKET 3 -->
+    <script>
+        const daftarSoal = [
+            { 
+                id: 1, 
+                kategori: "TWK - Pancasila & Sejarah", 
+                soal: "Perumusan dasar negara Indonesia melalui proses panjang yang melibatkan perdebatan konstitusional. Piagam Jakarta (Jakarta Charter) yang disahkan pada tanggal 22 Juni 1945 kemudian mengalami perubahan pada sila pertama atas usul tokoh Indonesia timur demi menjaga...", 
+                opsi: ["Sistem pemerintahan presidensial", "Persatuan dan kesatuan bangsa yang majemuk", "Hubungan diplomatik dengan negara sekutu", "Sistem ekonomi liberal", "Kekuasaan penuh legislatif"], 
+                kunci: 1 
+            },
+            { 
+                id: 2, 
+                kategori: "TWK - UUD NRI 1945", 
+                soal: "Berdasarkan UUD NRI Tahun 1945 Pasal 30, usaha pertahanan dan keamanan negara dilaksanakan dengan menggunakan sistem pertahanan dan keamanan rakyat semesta (Sishankamrata) di mana komponen utamanya adalah...", 
+                opsi: ["Kepolisian Negara Republik Indonesia", "Tentara Nasional Indonesia", "Rakyat jelata bersenjata", "Milisi daerah otonom", "Satuan Polisi Pamong Praja"], 
+                kunci: 1 
+            },
+            { 
+                id: 3, 
+                kategori: "TWK - Nasionalisme", 
+                soal: "Sebagai seorang Aparatur Sipil Negara (ASN), wujud nyata penerapan nilai nasionalisme dalam pengelolaan anggaran instansi publik adalah...", 
+                opsi: ["Menggunakan sisa anggaran untuk kepentingan pribadi di akhir tahun", "Mengalokasikan dana secara transparan, efisien, dan berorientasi pada kepentingan masyarakat luas", "Menunda penyerapan anggaran agar mendapat bunga bank", "Membatasi akses informasi penggunaan anggaran dari publik", "Memprioritaskan rekanan proyek yang memiliki hubungan kekerabatan"], 
+                kunci: 1 
+            },
+            { 
+                id: 4, 
+                kategori: "TWK - Bela Negara", 
+                soal: "Bela negara tidak hanya berarti memanggul senjata menghadapi musuh dari luar, namun juga melestarikan lingkungan hidup dan menjaga kekayaan alam Indonesia. Tindakan ini merupakan wujud nyata bela negara dalam aspek...", 
+                opsi: ["Pertahanan militer langsung", "Kesadaran berbangsa dan bernegara serta kecintaan terhadap tanah air", "Diplomasi internasional tingkat tinggi", "Penegakan hukum pidana khusus", "Politik luar negeri bebas aktif"], 
+                kunci: 1 
+            },
+            { 
+                id: 5, 
+                kategori: "TWK - Pilar Negara", 
+                soal: "Bhinneka Tunggal Ika sebagai semboyan resmi negara menegaskan bahwa meskipun bangsa Indonesia terdiri atas keragaman suku, agama, ras, dan budaya, namun tetap satu kesatuan. Tantangan utama implementasi semboyan ini di era globalisasi adalah...", 
+                opsi: ["Masuknya budaya asing yang mendegradasi nilai-nilai luhur dan lunturnya kearifan lokal", "Peningkatan jumlah investasi asing di sektor manufaktur", "Perkembangan teknologi informasi yang mempercepat arus komunikasi", "Penggunaan bahasa internasional dalam dunia pendidikan", "Kerjasama bilateral antarnegara berkembang"], 
+                kunci: 0 
+            },
+            { 
+                id: 6, 
+                kategori: "TIU - Silogisme Logika", 
+                soal: "Semua inovator teknologi memiliki kreativitas tinggi. Sebagian perancang sistem informasi adalah inovator teknologi. Kesimpulan yang sah adalah...", 
+                opsi: ["Semua perancang sistem informasi memiliki kreativitas tinggi.", "Sebagian perancang sistem informasi memiliki kreativitas tinggi.", "Tidak ada perancang sistem informasi yang kreatif.", "Semua yang kreatif adalah perancang sistem informasi.", "Sebagian inovator teknologi bukan perancang sistem informasi."], 
+                kunci: 1 
+            },
+            { 
+                id: 7, 
+                kategori: "TIU - Deret Angka", 
+                soal: "Carilah angka kelanjutan dari barisan berikut: 3, 7, 15, 31, 63, ...", 
+                opsi: ["125", "127", "131", "135", "140"], 
+                kunci: 1 
+            },
+            { 
+                id: 8, 
+                kategori: "TIU - Aritmatika & Pecahan", 
+                soal: "Nilai dari operasi hitung berikut: (2 1/2 + 1 3/4) : (1/4) adalah...", 
+                opsi: ["15", "16", "17", "18", "19"], 
+                kunci: 2 
+            },
+            { 
+                id: 9, 
+                kategori: "TIU - Penalaran Analitis", 
+                soal: "Dalam tes lari jarak pendek, kecepatan pelari P lebih cepat daripada Q. Pelari R sama cepatnya dengan S. Pelari Q lebih cepat daripada R. Pelari T lebih lambat daripada S. Siapakah pelari yang paling lambat di antara kelima pelari tersebut?", 
+                opsi: ["P", "Q", "R", "S", "T"], 
+                kunci: 4 
+            },
+            { 
+                id: 10, 
+                kategori: "TIU - Kecepatan & Jarak", 
+                soal: "Sebuah bus melaju sejauh 240 km dalam waktu 4 jam. Jika kecepatan bus tersebut ditambah 20 km/jam dari kecepatan semula, berapa waktu yang dibutuhkan untuk menempuh jarak sejauh 300 km?", 
+                opsi: ["3 jam", "3,5 jam", "4 jam", "4,5 jam", "5 jam"], 
+                kunci: 0 
+            },
+            { 
+                id: 11, 
+                kategori: "TIU - Perbandingan Senilai", 
+                soal: "Untuk mengecat dinding seluas 48 meter persegi dibutuhkan 4 kaleng cat. Jika seseorang ingin mengecat dinding seluas 144 meter persegi, berapa kaleng cat yang harus dibeli?", 
+                opsi: ["10 kaleng", "11 kaleng", "12 kaleng", "14 kaleng", "16 kaleng"], 
+                kunci: 2 
+            },
+            { 
+                id: 12, 
+                kategori: "TIU - Logika Silogisme 2", 
+                soal: "Tidak ada akademisi yang tidak menyukai literasi membaca. Sebagian dosen perguruan tinggi adalah akademisi. Kesimpulan yang tepat adalah...", 
+                opsi: ["Semua dosen perguruan tinggi menyukai literasi membaca.", "Sebagian dosen perguruan tinggi menyukai literasi membaca.", "Tidak ada dosen perguruan tinggi yang menyukai literasi membaca.", "Semua penyuka literasi membaca adalah dosen perguruan tinggi.", "Sebagian akademisi tidak menyukai literasi."], 
+                kunci: 1 
+            },
+            { 
+                id: 13, 
+                kategori: "TIU - Aritmatika Persentase", 
+                soal: "Harga pembelian sebuah sepeda motor bekas adalah Rp12.000.000,00. Setelah diperbaiki, sepeda motor tersebut dijual kembali dengan keuntungan sebesar 20%. Berapa harga jual sepeda motor tersebut?", 
+                opsi: ["Rp13.500.000,00", "Rp14.000.000,00", "Rp14.400.000,00", "Rp15.000.000,00", "Rp15.600.000,00"], 
+                kunci: 2 
+            },
+            { 
+                id: 14, 
+                kategori: "TIU - Aljabar Sederhana", 
+                soal: "Jika $4a + 3 = 2a + 13$, berapakah nilai dari $3a - 2$?", 
+                opsi: ["10", "11", "13", "15", "16"], 
+                kunci: 2 
+            },
+            { 
+                id: 15, 
+                kategori: "TKP - Pelayanan Publik", 
+                soal: "Seorang warga lanjut usia datang ke kantor pelayanan publik dengan kebingungan karena tidak memahami prosedur pengambilan dokumen kependudukan digital. Sikap Anda sebagai ASN adalah...", 
+                opsi: ["Menyuruhnya membaca panduan tertulis yang ditempel di dinding tanpa membantu.", "Menyambut dengan ramah, menuntun langkah demi langkah proses pengisian, dan membantu mencetakkan dokumennya dengan sabar.", "Meminta anggota keluarga lain untuk mengurusnya lain hari.", "Menyuruhnya antre ulang dari nomor paling belakang.", "Mengabaikannya karena Anda sedang sibuk merekap laporan."], 
+                bobot: [1, 5, 2, 1, 1] 
+            },
+            { 
+                id: 16, 
+                kategori: "TKP - Jejaring Kerja & Kolaborasi", 
+                soal: "Dalam pelaksanaan program kerja lintas instansi, terjadi perbedaan cara pandang antara instansi Anda dan instansi mitra yang dikhawatirkan dapat menghambat jalannya program. Sikap Anda adalah...", 
+                opsi: ["Memutuskan untuk berjalan sendiri tanpa mempedulikan masukan instansi mitra.", "Mengajak pihak mitra untuk berdiskusi secara terbuka, mencari titik temu, dan menyelaraskan langkah demi tercapainya tujuan bersama.", "Melaporkan instansi mitra kepada pimpinan tingkat atas agar diberi sanksi.", "Menunda pekerjaan hingga instansi mitra mengikuti aturan instansi Anda.", "Mengikuti seluruh kemauan mitra tanpa evaluasi kritis."], 
+                bobot: [1, 5, 2, 1, 1] 
+            },
+            { 
+                id: 17, 
+                kategori: "TKP - Integritas & Anti-Korupsi", 
+                soal: "Anda menemukan amplop berisi sejumlah uang di laci meja kerja setelah melayani seorang pengusaha yang mengurus perizinan strategis di instansi Anda. Sikap Anda adalah...", 
+                opsi: ["Mengambil uang tersebut untuk keperluan tambahan belanja pribadi secara diam-diam.", "Menolak dan melaporkan penemuan uang tersebut kepada unit pengendali gratifikasi instansi untuk dikembalikan.", "Membagikan uang tersebut kepada rekan satu divisi di kantor.", "Mendiamkannya dan membiarkan uang tersebut tetap berada di dalam laci.", "Mencari pengusaha tersebut di luar kantor untuk meminta tambahan."], 
+                bobot: [1, 5, 1, 2, 1] 
+            },
+            { 
+                id: 18, 
+                kategori: "TKP - Profesionalisme & Adaptabilitas", 
+                soal: "Atasan memberikan tugas baru di luar bidang rutin Anda dengan tenggat waktu yang ketat, guna menguji kemampuan pengembangan kompetensi pegawai. Sikap Anda adalah...", 
+                opsi: ["Menolak tugas tersebut secara mentah-mentah karena merasa tidak sesuai dengan deskripsi pekerjaan awal.", "Menerima tugas tersebut dengan antusias, mempelajari hal baru yang diperlukan secara cepat, dan berkonsultasi kepada rekan yang lebih berpengalaman.", "Mengerjakan tugas tersebut asal jadi tanpa riset mendalam.", "Menyerahkan seluruh tugas tersebut kepada staf magang di kantor.", "Sering mengeluh kepada rekan kerja mengenai beban tugas tambahan."], 
+                bobot: [1, 5, 2, 1, 1] 
+            },
+            { 
+                id: 19, 
+                kategori: "TKP - Orientasi pada Hasil", 
+                soal: "Target penyelesaian laporan tahunan instansi Anda dipercepat oleh pimpinan pusat dari jadwal semula, sementara data dari beberapa bidang belum sepenuhnya terkumpul lengkap. Sikap Anda adalah...", 
+                opsi: ["Menunggu seluruh data terkumpul santai tanpa menghiraukan instruksi percepatan.", "Mengambil inisiatif proaktif untuk jemput bola meminta data ke bidang terkait, menyusun kerangka laporan, dan mengebut penyelesaiannya secara teliti.", "Membuat estimasi data fiktif agar laporan terlihat cepat selesai.", "Menyerahkan tanggung jawab penyusunan kepada staf lain.", "Mengeluhkan kebijakan pimpinan yang dianggap terlalu mendadak."], 
+                bobot: [1, 5, 1, 1, 2] 
+            },
+            { 
+                id: 20, 
+                kategori: "TKP - Semangat Berprestasi", 
+                soal: "Kantor mengadakan ajang inovasi pelayanan publik antarpegawai. Anda memiliki ide program yang bagus, namun belum pernah dicoba sebelumnya dan memiliki risiko kegagalan teknis. Sikap Anda adalah...", 
+                opsi: ["Mengurungkan niat untuk ikut serta karena takut gagal dan dikritik.", "Mempersiapkan ide inovasi tersebut dengan matang, memperhitungkan risiko mitigasinya, dan mendaftarkannya dengan penuh percaya diri.", "Meniru persis ide dari pegawai tahun lalu yang sudah pasti menang.", "Meminta rekan lain untuk mempresentasikan ide Anda agar nama Anda tidak terseret jika gagal.", "Mendaftar sekadar meramaikan acara tanpa persiapan sungguh-sungguh."], 
+                bobot: [1, 5, 2, 1, 1] 
+            }
+        ];
+
+        let peserta = { nama: "", nomor: "" };
+        let currentIndex = 0;
+        let jawabanUser = {}; 
+        
+        let totalWaktuAlokasi = 1080; // Total 18 menit (1080 detik)
+        let waktuSisa = 1080; 
+        let intervalTimer;
+
+        function mulaiUjianApp() {
+            const nama = document.getElementById('input-nama').value.trim();
+            const nomor = document.getElementById('input-nomor').value.trim();
+
+            if (!nama || !nomor) {
+                alert("Mohon isi Nama Lengkap dan Nomor Peserta terlebih dahulu!");
+                return;
+            }
+
+            peserta.nama = nama;
+            peserta.nomor = nomor;
+
+            document.getElementById('info-peserta').innerText = `${nama} (${nomor})`;
+            document.getElementById('halaman-login').classList.add('hidden');
+            document.getElementById('halaman-ujian').classList.remove('hidden');
+
+            loadSoal();
+            mulaiTimer();
+        }
+
+        function mulaiTimer() {
+            const timerDisplay = document.getElementById('timer');
+            
+            intervalTimer = setInterval(() => {
+                let menit = Math.floor(waktuSisa / 60);
+                let detik = waktuSisa % 60;
+
+                timerDisplay.innerText = 
+                    (menit < 10 ? "0" + menit : menit) + ":" + 
+                    (detik < 10 ? "0" + detik : detik);
+
+                if (waktuSisa <= 0) {
+                    clearInterval(intervalTimer);
+                    alert("Waktu ujian telah habis!");
+                    selesaiUjian();
+                } else {
+                    waktuSisa--;
+                }
+            }, 1000);
+        }
+
+        function initNavigasi() {
+            const navGrid = document.getElementById('nav-grid');
+            navGrid.innerHTML = '';
+            daftarSoal.forEach((item, index) => {
+                let btn = document.createElement('button');
+                btn.innerText = index + 1;
+                let isTerisi = jawabanUser[index] !== undefined;
+                btn.className = `p-2 rounded-lg font-bold text-xs border transition ${
+                    isTerisi 
+                    ? 'bg-teal-600 text-white border-teal-600' 
+                    : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
+                }`;
+                btn.onclick = () => {
+                    currentIndex = index;
+                    loadSoal();
+                };
+                navGrid.appendChild(btn);
+            });
+        }
+
+        function loadSoal() {
+            const soal = daftarSoal[currentIndex];
+            document.getElementById('nomor-soal').innerText = `Soal No. ${currentIndex + 1} dari ${daftarSoal.length}`;
+            document.getElementById('kategori-soal').innerText = soal.kategori;
+            document.getElementById('teks-soal').innerText = soal.soal;
+
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            soal.opsi.forEach((opsiText, i) => {
+                let isChecked = jawabanUser[currentIndex] === i ? 'checked' : '';
+                let div = document.createElement('label');
+                div.className = `flex items-center p-3 border rounded-lg cursor-pointer transition ${isChecked ? 'border-teal-600 bg-teal-50' : 'border-gray-200 hover:bg-gray-50'}`;
+                div.innerHTML = `
+                    <input type="radio" name="jawaban" value="${i}" ${isChecked} onclick="pilihJawaban(${i})" class="mr-3 text-teal-600 h-4 w-4">
+                    <span class="text-gray-700 font-medium">${String.fromCharCode(65 + i)}. ${opsiText}</span>
+                `;
+                optionsContainer.appendChild(div);
+            });
+            initNavigasi();
+        }
+
+        function pilihJawaban(i) {
+            jawabanUser[currentIndex] = i;
+            initNavigasi();
+        }
+
+        function nextSoal() {
+            if (currentIndex < daftarSoal.length - 1) {
+                currentIndex++;
+                loadSoal();
+            }
+        }
+
+        function prevSoal() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                loadSoal();
+            }
+        }
+
+        function konfirmasiSelesai() {
+            let jumlahTerisi = Object.keys(jawabanUser).length;
+            let jumlahKosong = daftarSoal.length - jumlahTerisi;
+
+            let konfirm = confirm(`Konfirmasi Selesai Ujian Tier 2:\n- Soal Terjawab: ${jumlahTerisi}\n- Belum Terjawab: ${jumlahKosong}\n\nYakin akhiri sesi sekarang?`);
+            if (konfirm) {
+                clearInterval(intervalTimer);
+                selesaiUjian();
+            }
+        }
+
+        function selesaiUjian() {
+            let detikTerpakai = totalWaktuAlokasi - waktuSisa;
+            let menitRil = Math.floor(detikTerpakai / 60);
+            let detikRil = detikTerpakai % 60;
+            let formatWaktuRil = `${menitRil} menit ${detikRil} detik`;
+
+            let totalSkor = 0;
+            daftarSoal.forEach((item, index) => {
+                let ans = jawabanUser[index];
+                if (ans !== undefined) {
+                    if (item.bobot) {
+                        totalSkor += item.bobot[ans];
+                    } else {
+                        if (ans === item.kunci) {
+                            totalSkor += 5;
+                        }
+                    }
+                }
+            });
+
+            document.getElementById('halaman-ujian').classList.add('hidden');
+            document.getElementById('halaman-hasil').classList.remove('hidden');
+
+            document.getElementById('res-nama').innerText = peserta.nama;
+            document.getElementById('res-nomor').innerText = peserta.nomor;
+            document.getElementById('res-skor').innerText = totalSkor;
+            document.getElementById('res-waktu').innerText = formatWaktuRil;
+
+            let statusEl = document.getElementById('res-status');
+
+            if (detikTerpakai <= 600 && totalSkor >= 85) {
+                statusEl.innerHTML = "<span class='font-bold text-teal-600'>Tier 2 Elite (Sangat Luar Biasa!)</span><br><span class='text-xs text-gray-600'>Pengerjaan kilat di bawah 10 menit dengan akurasi prima. Refleks ujian Anda sudah luar biasa!</span>";
+            } else if (detikTerpakai <= 1080 && totalSkor >= 75) {
+                statusEl.innerHTML = "<span class='font-bold text-emerald-600'>Tier 2 Solid (Memenuhi Standar Aman)</span><br><span class='text-xs text-gray-600'>Waktu dan akurasi masuk dalam rentang ideal tes riil. Pertahankan konsistensi ini!</span>";
+            } else {
+                statusEl.innerHTML = "<span class='font-bold text-red-600'>Perlu Evaluasi (Belum Mencapai Target 90%)</span><br><span class='text-xs text-gray-600'>Skor atau waktu pengerjaan masih perlu diasah lagi. Ayo coba ulangi paket ini!</span>";
+            }
+        }
+    </script>
+</body>
+</html>

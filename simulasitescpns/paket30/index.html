@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SANG PNS - Simulasi CAT SKD CPNS (Tier 3 - Paket 2)</title>
+    <!-- Tailwind CSS v3 CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 font-sans">
+
+    <!-- HALAMAN LOGIN / REGISTRASI PESERTA -->
+    <div id="halaman-login" class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
+            <div class="text-center mb-6">
+                <span class="bg-purple-100 text-purple-800 text-xs font-semibold px-3 py-1 rounded-full">SANG PNS - TIER 3 (PAKET 2 - 30 SOAL)</span>
+                <h2 class="text-2xl font-bold text-indigo-950 mt-2">Simulasi CAT SKD CPNS</h2>
+                <p class="text-gray-500 text-sm mt-1">Waktu Ujian: 27 Menit | Penguatan TWK Implementatif & Studi Kasus</p>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Lengkap</label>
+                    <input type="text" id="input-nama" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600" placeholder="Contoh: Febri Delise">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Nomor Peserta / NIK</label>
+                    <input type="text" id="input-nomor" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600" placeholder="Contoh: 610012345678">
+                </div>
+                <button onclick="mulaiUjianApp()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg transition shadow-md">
+                    Mulai Ujian Tier 3 - Paket 2 (30 Soal)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HALAMAN UTAMA UJIAN -->
+    <div id="halaman-ujian" class="hidden">
+        <header class="bg-indigo-950 text-white p-4 shadow-md flex justify-between items-center">
+            <div>
+                <h1 class="text-lg font-bold">CAT BKN - Seleksi Kompetensi Dasar (SKD) Tier 3 - V2</h1>
+                <p id="info-peserta" class="text-xs text-indigo-200"></p>
+            </div>
+            <div id="timer" class="bg-red-600 px-4 py-2 rounded-lg font-mono font-bold text-lg shadow-inner">
+                27:00
+            </div>
+        </header>
+
+        <main class="max-w-6xl mx-auto p-4 grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+            <!-- Bagian Soal (Kiri - 3 Kolom) -->
+            <div class="md:col-span-3 bg-white p-6 rounded-xl shadow-md flex flex-col justify-between min-h-[480px]">
+                <div>
+                    <div class="flex justify-between items-center border-b pb-3 mb-4">
+                        <span id="nomor-soal" class="font-bold text-lg text-indigo-950">Soal No. 1</span>
+                        <span id="kategori-soal" class="text-sm bg-purple-100 text-purple-800 px-3 py-1 rounded-full font-semibold">TWK / TIU / TKP</span>
+                    </div>
+                    <p id="teks-soal" class="text-gray-800 text-lg mb-6 leading-relaxed whitespace-pre-line">
+                        Pertanyaan soal akan dimuat di sini...
+                    </p>
+
+                    <!-- Pilihan Jawaban (A-E) -->
+                    <div id="options-container" class="space-y-3">
+                        <!-- Digenerate dinamis -->
+                    </div>
+                </div>
+
+                <!-- Navigasi Bawah Soal -->
+                <div class="flex justify-between mt-8 pt-4 border-t">
+                    <button onclick="prevSoal()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-5 py-2 rounded-lg font-semibold transition">Sebelumnya</button>
+                    <button onclick="nextSoal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-semibold transition">Selanjutnya</button>
+                </div>
+            </div>
+
+            <!-- Navigasi Nomor Soal (Kanan - 1 Kolom) -->
+            <div class="bg-white p-4 rounded-xl shadow-md h-fit max-h-[520px] flex flex-col">
+                <h3 class="font-bold text-gray-700 mb-3 border-b pb-2">Navigasi Soal (1 - 30)</h3>
+                <div id="nav-grid" class="grid grid-cols-5 gap-2 mb-6 overflow-y-auto p-1 max-h-[320px]"></div>
+                <div class="text-xs space-y-1 mb-4 text-gray-600 border-t pt-2">
+                    <div class="flex items-center gap-2"><span class="w-3 h-3 bg-indigo-600 inline-block rounded"></span> Sudah dijawab</div>
+                    <div class="flex items-center gap-2"><span class="w-3 h-3 bg-gray-200 border inline-block rounded"></span> Belum dijawab</div>
+                </div>
+                <button onclick="konfirmasiSelesai()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-lg font-bold shadow transition">
+                    Selesai Ujian
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- HALAMAN HASIL UJIAN -->
+    <div id="halaman-hasil" class="hidden flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-lg text-center">
+            <h2 class="text-2xl font-bold text-indigo-950 mb-1">Hasil Evaluasi Tier 3 - Paket 2</h2>
+            <p class="text-gray-500 text-sm mb-6">Laporan Uji Ketahanan & Akurasi CAT BKN (30 Soal Versi 2)</p>
+            
+            <div class="bg-slate-50 p-4 rounded-xl text-left mb-6 space-y-2 border">
+                <p><strong>Nama Peserta:</strong> <span id="res-nama"></span></p>
+                <p><strong>Nomor Peserta:</strong> <span id="res-nomor"></span></p>
+                <hr>
+                <p><strong>Total Skor Akhir:</strong> <span id="res-skor" class="text-2xl font-extrabold text-indigo-600"></span></p>
+                <p><strong>Waktu Terpakai:</strong> <span id="res-waktu" class="font-semibold text-gray-700"></span></p>
+                <p class="pt-2"><strong>Status Evaluasi Tier 3:</strong><br><span id="res-status" class="text-base block mt-1"></span></p>
+            </div>
+
+            <button onclick="location.reload()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2 rounded-lg transition shadow">
+                Ulangi Simulasi (Menu Utama)
+            </button>
+        </div>
+    </div>
+
+    <!-- SCRIPT LOGIKA APLIKASI & 30 SOAL TIER 3 PAKET 2 -->
+    <script>
+        const daftarSoal = [
+            // ---------------- TWK IMPLEMENTATIF (1 - 10) ----------------
+            { 
+                id: 1, 
+                kategori: "TWK - Pancasila (Implementasi Sila ke-1)", 
+                soal: "Di ruang kerja kantor instansi pemerintah, terdapat pegawai dari berbagai latar belakang keyakinan beragama. Ketika jam istirahat siang bertepatan dengan waktu salat, seorang pegawai muslim hendak menunaikan ibadah, namun ruang ibadah kantor sedang dalam perbaikan. Sikap toleransi dan pengamalan nilai Pancasila yang tepat ditunjukkan oleh...", 
+                opsi: [
+                    "Melarang pegawai tersebut beribadah di ruangan kerja karena mengganggu pemandangan.", 
+                    "Menyediakan sudut ruangan kerja yang bersih dan tenang secara bersama-sama untuk memfasilitasi rekan yang ingin beribadah dengan tetap menjaga kenyamanan bersama.", 
+                    "Meminta semua pegawai non-muslim meninggalkan ruangan kantor selama waktu ibadah.", 
+                    "Menunda waktu ibadah hingga jam kantor selesai tanpa peduli ketentuan agama.", 
+                    "Membiarkan pegawai tersebut kebingungan mencari tempat di luar kantor dalam cuaca panas."
+                ], 
+                kunci: 1 
+            },
+            { 
+                id: 2, 
+                kategori: "TWK - UUD NRI 1945 (Demokrasi & Kedaulatan Rakyat)", 
+                soal: "Pasal 1 ayat (2) UUD NRI 1945 menegaskan bahwa kedaulatan berada di tangan rakyat dan dilaksanakan menurut Undang-Undang Dasar. Dalam konteks pelaksanaan pemilihan umum kepala daerah, wujud implementasi nyata kedaulatan rakyat yang beretika hukum adalah...", 
+                opsi: [
+                    "Menerima politik uang (serangan fajar) demi keuntungan finansial sesaat.", 
+                    "Menggunakan hak pilih secara mandiri, jujur, rasional, serta menolak segala bentuk kampanye hitam dan politik identitas yang memecah belah.", 
+                    "Golput (golongan putih) sebagai bentuk protes tanpa solusi konstruktif.", 
+                    "Memaksa orang lain memilih calon tertentu dengan ancaman kekerasan.", 
+                    "Menyebarkan hoaks mengenai kecurangan pemilu tanpa bukti valid di media sosial."
+                ], 
+                kunci: 1 
+            },
+            { 
+                id: 3, 
+                kategori: "TWK - Nasionalisme (Persatuan & Gotong Royong)", 
+                soal: "Lingkungan perumahan tempat tinggal Anda dilanda banjir bandang yang merusak fasilitas umum. Warga dari berbagai suku dan status sosial bahu-membahu membersihkan lumpur. Sebagai ASN, sikap nasionalisme yang paling tepat dicerminkan melalui...", 
+                opsi: [
+                    "Menunggu bantuan pemerintah pusat datang sambil berdiam diri di rumah yang aman.", 
+                    "Turut serta secara aktif dalam kegiatan gotong royong tanpa memandang status sosial maupun latar belakang suku tetangga korban banjir.", 
+                    "Memberikan sumbangan uang dengan syarat nama Anda dipampang di spanduk utama.", 
+                    "Menyerahkan seluruh urusan pembersihan kepada petugas kebersihan daerah semata.", 
+                    "Meminta ganti rugi atas tenaga yang Anda keluarkan untuk kerja bakti."
+                ], 
+                kunci: 1 
+            },
+            { 
+                id: 4, 
+                kategori: "TWK - Pilar Negara (Bhinneka Tunggal Ika)", 
+                soal: "Sebuah instansi pusat menerima pegawai baru dari wilayah perbatasan yang memiliki logat bicara khas daerah yang cukup pekat, sehingga kadang diejek oleh sebagian rekan senior. Sebagai senior yang memahami pilar Bhinneka Tunggal Ika, tindakan Anda adalah...", 
+                opsi: [
+                    "Ikut tertawa bersama rekan senior lain agar terlihat akrab dengan kelompok mereka.", 
+                    "Menegur secara santun rekan-rekan yang mengejek, serta merangkul pegawai baru tersebut dan membimbingnya agar percaya diri beradaptasi di lingkungan kerja.", 
+                    "Menyuruh pegawai baru tersebut mengubah logat bicaranya secara paksa.", 
+                    "Membiarkan perundungan verbal tersebut karena dianggap candaan biasa.", 
+                    "Melaporkan pegawai baru tersebut kepada atasan karena dianggap tidak bisa menyesuaikan diri."
+                ], 
+                kunci: 1 
+            },
+            { 
+                id: 5, 
+                kategori: "TWK - Bela Negara (Kesadaran Hukum & Disiplin ASN)", 
+                soal: "Sebagai bentuk bela Negara di lingkungan birokrasi, seorang ASN dituntut untuk mematuhi jam kerja dan peraturan disiplin pegawai. Ketika atasan sedang tidak berada di tempat dinas, tindakan yang mencerminkan integritas bela negara adalah...", 
+                opsi: [
+                    "Pulang lebih cepat dari jam ketentuan karena tidak ada pengawasan langsung dari atasan.", 
+                    "Tetap bekerja secara disiplin, menyelesaikan sisa tugas laporan dengan penuh tanggung jawab, dan menjaga marwah instansi pemerintah.", 
+                    "Memanfaatkan waktu luang untuk bermain game online di komputer kantor sepanjang hari.", 
+                    "Keluar kantor untuk urusan pribadi tanpa izin selama berjam-jam.", 
+                    "Menyuruh staf honorer mengerjakan seluruh tugas Anda."
+                ], 
+                kunci: 1 
+            },
+            { 
+                id: 6, 
+                kategori: "TWK - Pancasila (Sila ke-5 Keadilan Sosial)", 
+                soal: "Dalam pendistribusian Bantuan Langsung Tunai (BLT) untuk warga kurang mampu di desa, ketua RT mendapati nama kerabat dekatnya yang ekonominya cukup mapan dimasukkan ke dalam daftar penerima bantuan. Sikap Anda jika menjadi anggota tim verifikasi desa adalah...", 
+                opsi: [
+                    "Mendiamkannya demi menjaga keharmonisan hubungan kekeluargaan dengan ketua RT.", 
+                    "Mencoret nama kerabat tersebut berdasarkan kriteria obyektif kemiskinan dan menggantikannya dengan warga lain yang benar-benar berhak demi menegakkan keadilan sosial.", 
+                    "Memberikan bantuan tersebut secara diam-diam kepada pihak lain tanpa mengubah data resmi.", 
+                    "Meminta bagian dari dana bantuan tersebut sebagai uang tutup mulut.", 
+                    "Membatalkan seluruh penyaluran bantuan untuk satu desa."
+                ], 
+                kunci: 1 
+            },
+            { 
+                id: 7, 
+                kategori: "TWK - Sejarah Kebangsaan (Sumpah Pemuda)", 
+                soal: "Ikrar Sumpah Pemuda 1928 menegaskan satu tanah air, satu bangsa, dan satu bahasa yaitu Indonesia, meskipun para pemuda saat itu datang dari Jong Java, Jong Sumatranen Bond, dan berbagai organisasi kedaerahan lain. Relevansi nilai ini di era modern adalah...", 
+                opsi: [
+                    "Mengutamakan kepentingan kelompok daerah asal dalam setiap kebijakan publik nasional.", 
+                    "Menepis ego kesukuan dan mengedepankan kolaborasi nasional demi kemajuan bangsa di kancah global.", 
+                    "Membubarkan seluruh organisasi kemasyarakatan berbasis kebudayaan daerah.", 
+                    "Menghapuskan penggunaan bahasa daerah di seluruh wilayah Indonesia.", 
+                    "Membatasi mobilitas penduduk antarpulau demi kemurnian budaya lokal."
+                ], 
+                kunci: 1 
+            },
+            { 
+                id: 8, 
+                kategori: "TWK - UUD NRI 1945 (Pertahanan & Keamanan Negara)", 
+                soal: "Pasal 30 UUD NRI 1945 menyatakan bahwa usaha pertahanan dan keamanan negara dilaksanakan melalui sistem pertahanan dan keamanan rakyat semesta (Sishankamrata). Peran aktif warga negara biasa dalam mendukung sistem pertahanan negara di bidang nir-militer adalah...", 
+                opsi: [
+                    "Ikut serta mengangkat senjata di garis depan perbatasan negara tanpa pelatihan militer resmi.", 
+                    "Meningkatkan ketahanan diri terhadap ancaman ideologi radikal, menjaga ketertiban umum, dan memperkuat literasi digital bangsa.", 
+                    "Melakukan patroli malam bersenjata tajam di setiap sudut perkotaan secara ilegal.", 
+                    "Menutup akses komunikasi asing secara total dari perangkat pribadi.", 
+                    "Menolak membayar pajak jika merasa tidak aman."
+                ], 
+                kunci: 1 
+            },
+            { 
+                id: 9, 
+                kategori: "TWK - Nasionalisme (Etos Kerja & Profesionalisme)", 
+                soal: "Seorang pahlawan masa kini di bidang pelayanan publik dituntut memiliki etos kerja yang tinggi untuk melayani masyarakat tanpa pamrih. Ketika Anda menghadapi antrean warga yang membludak di penghujung jam kerja, tindakan Anda adalah...", 
+                opsi: [
+                    "Segera menutup loket tepat pukul 16.00 dan meninggalkan warga yang belum terlayani.", 
+                    "Tetap melayani sisa warga dengan ramah dan sabar sampai seluruh antrean terselesaikan dengan tuntas sebagai bentuk dedikasi kepada negara.", 
+                    "Meminta warga membayar uang tambahan agar dilayani lembur.", 
+                    "Menyuruh warga kembali besok pagi tanpa memberikan penjelasan sopan.", 
+                    "Menyerahkan sisa pekerjaan kepada petugas kebersihan kantor."
+                ], 
+                kunci: 1 
+            },
+            { 
+                id: 10, 
+                kategori: "TWK - Wawasan Nusantara", 
+                soal: "Wawasan Nusantara memandang wilayah Indonesia dengan segala isi dan kekayaannya sebagai satu kesatuan wilayah yang utuh. Contoh perwujudan wawasan nusantara di bidang ekonomi adalah...", 
+                opsi: [
+                    "Penguasaan sumber daya alam oleh pihak asing demi keuntungan instan.", 
+                    "Pemberlakuan tingkat harga kebutuhan pokok dan pembangunan infrastruktur yang berkeadilan di seluruh wilayah dari Sabang sampai Merauke.", 
+                    "Pemusatan seluruh pusat industri manufaktur hanya di Pulau Jawa.", 
+                    "Pembatasan distribusi barang antarprovinsi untuk melindungi produk lokal saja.", 
+                    "Pemberian pajak khusus bagi penduduk di luar pulau jawa."
+                ], 
+                kunci: 1 
+            },
+
+            // ---------------- TIU ANALITIS & HITUNG (11 - 20) ----------------
+            { 
+                id: 11, 
+                kategori: "TIU - Silogisme Logika", 
+                soal: "Semua pustakawan menyukai ketelitian. Sebagian guru bukan pustakawan.\n\nKesimpulan yang sah adalah...", 
+                opsi: [
+                    "Semua guru menyukai ketelitian.", 
+                    "Sebagian guru tidak menyukai ketelitian.", 
+                    "Tidak ada guru yang menyukai ketelitian.", 
+                    "Semua yang menyukai ketelitian adalah guru.", 
+                    "Sebagian guru menyukai ketelitian."
+                ], 
+                kunci: 1 
+            },
+            { 
+                id: 12, 
+                kategori: "TIU - Deret Angka", 
+                soal: "Tentukan angka selanjutnya dari barisan berikut:\n3, 6, 12, 24, 48, ...", 
+                opsi: ["72", "84", "96", "108", "120"], 
+                kunci: 2 
+            },
+            { 
+                id: 13, 
+                kategori: "TIU - Aritmatika & Pecahan", 
+                soal: "Hasil dari operasi hitung berikut:\n(3/4 + 2/5) × 40 - 10 adalah...", 
+                opsi: ["32", "34", "36", "38", "40"], 
+                kunci: 3 
+            },
+            { 
+                id: 14, 
+                kategori: "TIU - Penalaran Analitis", 
+                soal: "Dalam tes lari marathon, catatan waktu tempuh Rudi lebih cepat daripada Doni. Catatan waktu Wati lebih lambat daripada Siska. Waktu tempuh Doni sama dengan Wati. Siapakah pelari dengan waktu tempuh paling lambat?", 
+                opsi: ["Rudi", "Doni", "Wati", "Siska", "Data tidak cukup"], 
+                kunci: 3 
+            },
+            { 
+                id: 15, 
+                kategori: "TIU - Kecepatan & Jarak", 
+                soal: "Sebuah mobil menempuh jarak 180 km dalam waktu 3 jam. Jika kecepatan mobil tersebut ditingkatkan sebesar 15 km/jam dari kecepatan semula, berapa waktu yang dibutuhkan untuk menempuh jarak 315 km?", 
+                opsi: ["4 jam", "4,5 jam", "5 jam", "5,5 jam", "6 jam"], 
+                kunci: 1 
+            },
+            { 
+                id: 16, 
+                kategori: "TIU - Perbandingan Berbalik Nilai", 
+                soal: "Suatu pekerjaan renovasi gedung kantor dapat diselesaikan oleh 24 orang pekerja dalam waktu 15 hari. Jika pihak pemborong ingin pekerjaan tersebut selesai dalam 10 hari, berapa tambahan pekerja yang harus direkrut?", 
+                opsi: ["8 orang", "10 orang", "12 orang", "14 orang", "16 orang"], 
+                kunci: 2 
+            },
+            { 
+                id: 17, 
+                kategori: "TIU - Silogisme 2", 
+                soal: "Semua pemikir kritis adalah pemecah masalah yang handal. Sebagian manajer bukan pemikir kritis.\n\nKesimpulan yang tepat adalah...", 
+                opsi: [
+                    "Semua manajer adalah pemecah masalah yang handal.", 
+                    "Sebagian manajer bukan pemecah masalah yang handal.", 
+                    "Tidak ada manajer yang merupakan pemecah masalah yang handal.", 
+                    "Semua pemecah masalah yang handal adalah manajer.", 
+                    "Sebagian manajer adalah pemecah masalah yang handal."
+                ], 
+                kunci: 1 
+            },
+            { 
+                id: 18, 
+                kategori: "TIU - Aritmatika Persentase", 
+                soal: "Sebuah laptop di toko eletronik dibanderol seharga Rp5.000.000,00. Toko memberikan diskon 15%, dan kemudian memberikan potongan tambahan sebesar 10% dari harga setelah diskon pertama. Berapa harga akhir laptop tersebut?", 
+                opsi: ["Rp3.650.000,00", "Rp3.750.000,00", "Rp3.800.000,00", "Rp3.825.000,00", "Rp3.900.000,00"], 
+                kunci: 3 
+            },
+            { 
+                id: 19, 
+                kategori: "TIU - Aljabar Sederhana", 
+                soal: "Jika $5(x - 3) = 2x + 6$, berapakah nilai dari $x + 3$?", 
+                opsi: ["8", "9", "10", "11", "12"], 
+                kunci: 2 
+            },
+            { 
+                id: 20, 
+                kategori: "TIU - Logika Angka & Hitung Cepat", 
+                soal: "Berapakah hasil dari operasi: $250 \\times 12 - 640 \\div 8$?", 
+                opsi: ["2880", "2900", "2920", "2940", "2960"], 
+                kunci: 2 
+            },
+
+            // ---------------- TKP PROFESIONALISME & PELAYANAN (21 - 30) ----------------
+            { 
+                id: 21, 
+                kategori: "TKP - Pelayanan Publik", 
+                soal: "Anda bertugas di loket pelayanan kependudukan. Seorang penyandang disabilitas datang sendirian dan tampak kebingungan mengisi formulir digital pendaftaran. Sikap Anda adalah...", 
+                opsi: [
+                    "Meminta keluarganya datang mengurus dan menyuruhnya antre ulang.", 
+                    "Menghampiri dengan ramah, membimbing dan membantu mengisikan seluruh formulir digital tersebut dengan sabar sampai tuntas.", 
+                    "Menyerahkan formulir kertas biasa dan membiarkannya mengerjakannya sendiri di kursi tunggu.", 
+                    "Menyuruh orang lain di sebelah antrean untuk membantunya.", 
+                    "Mengabaikannya karena antrean umum sedang sangat padat."
+                ], 
+                bobot: [1, 5, 2, 1, 1] 
+            },
+            { 
+                id: 22, 
+                kategori: "TKP - Jejaring Kerja", 
+                soal: "Dalam penyusunan laporan akuntabilitas kinerja instansi, divisi Anda mendapati data dari divisi lain terlambat diserahkan sehingga menghambat proses cetak akhir. Sikap Anda...", 
+                opsi: [
+                    "Membiarkan laporan terlambat dan menyalahkan divisi lain di hadapan pimpinan.", 
+                    "Berkoordinasi secara proaktif dan persuasif dengan kepala divisi terkait, menawarkan bantuan pengolahan data bersama agar laporan selesai tepat waktu.", 
+                    "Melaporkan divisi tersebut secara resmi kepada pihak berwajib.", 
+                    "Mengerjakan data rekapitulasi secara asal-asalan demi mengejar tenggat waktu.", 
+                    "Mengundurkan diri dari tim penyusun."
+                ], 
+                bobot: [1, 5, 1, 1, 1] 
+            },
+            { 
+                id: 23, 
+                kategori: "TKP - Sosial Budaya", 
+                soal: "Anda dimutasi ke kantor layanan publik di daerah terluar yang memiliki kebiasaan adat istiadat dan tata cara komunikasi lokal yang sangat berbeda dengan latar belakang Anda. Sikap Anda...", 
+                opsi: [
+                    "Menolak berinteraksi dengan warga lokal karena merasa canggung dan berbeda budaya.", 
+                    "Mempelajari dan menghormati norma adat setempat secara terbuka, beradaptasi dengan santun, serta membangun komunikasi yang harmonis dalam pelayanan.", 
+                    "Meminta warga lokal menyesuaikan diri sepenuhnya dengan budaya asal Anda.", 
+                    "Mengajukan permohonan pindah tugas kembali ke kota asal dalam minggu pertama.", 
+                    "Mengabaikan aturan adat karena menganggap aturan kantor pusat lebih tinggi."
+                ], 
+                bobot: [1, 5, 1, 1, 1] 
+            },
+            { 
+                id: 24, 
+                kategori: "TKP - TIK (Teknologi Informasi)", 
+                soal: "Kantor Anda memberlakukan sistem arsip awan (cloud storage) baru untuk efisiensi penyimpanan data. Rekan kerja senior Anda yang gagap teknologi mengeluh kesulitan mengakses file penting. Sikap Anda...", 
+                opsi: [
+                    "Menertawakan ketidaktahuannya karena masalah teknologi di era modern adalah urusan masing-masing.", 
+                    "Dengan sabar meluangkan waktu mengajarkan cara penggunaan cloud storage tersebut langkah demi langkah hingga rekan Anda mandiri.", 
+                    "Mengerjakan seluruh penyimpanan file rekan tersebut selamanya.", 
+                    "Menyuruh rekan tersebut kembali menggunakan sistem manual kertas.", 
+                    "Melaporkan rekan senior tersebut kepada pimpinan sebagai pegawai tidak kompeten."
+                ], 
+                bobot: [1, 5, 1, 1, 1] 
+            },
+            { 
+                id: 25, 
+                kategori: "TKP - Profesionalisme", 
+                soal: "Anda sedang fokus menyusun draf SK pengangkatan pegawai yang harus diverifikasi sebelum jam 15.00. Tiba-tiba atasan meminta Anda memeriksa laporan keuangan mendadak yang juga harus selesai sore ini. Sikap Anda...", 
+                opsi: [
+                    "Menolak tugas tambahan dari atasan karena fokus pada draf SK.", 
+                    "Menerima kedua tugas tersebut, mengatur skala prioritas kerja secara sistematis, dan menyelesaikannya dengan cermat serta tuntas.", 
+                    "Mengerjakan laporan keuangan dan mengabaikan draf SK pengangkatan.", 
+                    "Menyerahkan draf SK kepada staf magang tanpa supervisi.", 
+                    "Mengeluh kepada rekan kerja bahwa beban kerja Anda tidak adil."
+                ], 
+                bobot: [1, 5, 2, 1, 1] 
+            },
+            { 
+                id: 26, 
+                kategori: "TKP - Anti-Korupsi", 
+                soal: "Seorang rekan satu tim meminta Anda membantu mengubah nominal angka pengeluaran pada nota pertanggungjawaban kegiatan kantor agar sesuai dengan sisa anggaran fiktif. Sikap Anda...", 
+                opsi: [
+                    "Menyetujuinya demi menjaga solidaritas pertemanan di kantor.", 
+                    "Menolak dengan tegas permintaan tersebut, mengingatkan pentingnya integritas keuangan negara, dan menyusun laporan sesuai pengeluaran riil yang sah.", 
+                    "Melakukan pemalsuan tersebut secara sembunyi-sembunyi agar aman.", 
+                    "Diam saja dan membiarkan rekan Anda melakukannya sendiri tanpa andil Anda.", 
+                    "Meminta bagian dari selisih anggaran fiktif tersebut."
+                ], 
+                bobot: [1, 5, 1, 2, 1] 
+            },
+            { 
+                id: 27, 
+                kategori: "TKP - Pelayanan Publik", 
+                soal: "Seorang warga datang dengan nada marah dan melontarkan kritik keras di ruang publik kantor karena antrean pelayanan dinilai terlalu lambat. Sikap Anda...", 
+                opsi: [
+                    "Membalas kemarahannya dan menyuruhnya keluar ruangan karena membuat keributan.", 
+                    "Mendengarkan keluh kesahnya dengan tenang, menunjukkan empati, meminta maaf atas ketidaknyamanan, dan segera memberikan penjelasan serta solusi pelayanan terbaik.", 
+                    "Mengabaikan dan berpura-pura sibuk dengan komputer Anda.", 
+                    "Memanggil petugas keamanan untuk mengusirnya keluar kantor.", 
+                    "Menyalahkan bagian sistem antrean pusat atas keterlambatan tersebut."
+                ], 
+                bobot: [1, 5, 1, 1, 1] 
+            },
+            { 
+                id: 28, 
+                kategori: "TKP - Jejaring Kerja", 
+                soal: "Dalam forum koordinasi lintas instansi penanggulangan krisis daerah, terjadi silang pendapat yang alot dan ego sektoral antarlembaga yang menghambat pengambilan keputusan darurat. Sikap Anda...", 
+                opsi: [
+                    "Memilih diam dan menarik diri dari perdebatan karena melelahkan.", 
+                    "Mengambil peran penengah yang netral, mencairkan suasana dengan pendekatan persuasif, dan mengarahkan fokus forum pada kepentingan penyelamatan masyarakat.", 
+                    "Mendukung salah satu pihak secara ekstrem untuk memperkeruh suasana.", 
+                    "Menyerang argumen instansi lain secara terbuka di hadapan media massa.", 
+                    "Menunggu instruksi tertulis dari pusat tanpa peduli situasi lapangan."
+                ], 
+                bobot: [1, 5, 1, 1, 1] 
+            },
+            { 
+                id: 29, 
+                kategori: "TKP - Sosial Budaya", 
+                soal: "Di instansi Anda diberlakukan tradisi kerja bakti membersihkan lingkungan kantor setiap Jumat sore. Di sisi lain, Anda sudah berjanji mengantar anggota keluarga berobat ke rumah sakit pada jam tersebut. Sikap Anda...", 
+                opsi: [
+                    "Mangkir dari kerja bakti tanpa memberitahu atasan maupun rekan tim.", 
+                    "Mengomunikasikan kondisi darurat keluarga Anda secara baik kepada pimpinan/koordinator, menyelesaikan tugas mendesak terlebih dahulu, dan tetap berkontribusi proporsional.", 
+                    "Membatalkan rencana berobat keluarga demi menghindari teguran rekan kerja.", 
+                    "Meminta rekan lain menggantikan tugas kerja bakti Anda dengan imbalan uang.", 
+                    "Memprotes kebijakan gotong royong kantor karena dianggap memberatkan waktu pribadi."
+                ], 
+                bobot: [1, 5, 1, 1, 1] 
+            },
+            { 
+                id: 30, 
+                kategori: "TKP - Profesionalisme", 
+                soal: "Menjelang batas akhir pengumpulan data evaluasi pegawai, Anda menemukan kesalahan ketik angka yang cukup fatal pada rekapitulasi data yang dikerjakan oleh rekan semeja Anda. Sikap Anda...", 
+                opsi: [
+                    "Membiarkan kesalahan tersebut agar rekan Anda ditegur langsung oleh atasan.", 
+                    "Secara diam-diam membantu merevisi dan memperbaiki kesalahan data tersebut bersama rekan Anda sebelum berkas diserahkan ke pimpinan.", 
+                    "Menertawakan kecerobohan rekan kerja Anda di depan staf lain.", 
+                    "Melaporkan rekan tersebut ke bagian disiplin sebagai pegawai yang tidak teliti.", 
+                    "Menolak ikut campur dan menyerahkan berkas apa adanya."
+                ], 
+                bobot: [1, 5, 1, 1, 1] 
+            }
+        ];
+
+        let peserta = { nama: "", nomor: "" };
+        let currentIndex = 0;
+        let jawabanUser = {}; 
+        
+        let totalWaktuAlokasi = 1620; // Total 27 menit (1620 detik)
+        let waktuSisa = 1620; 
+        let intervalTimer;
+
+        function mulaiUjianApp() {
+            const nama = document.getElementById('input-nama').value.trim();
+            const nomor = document.getElementById('input-nomor').value.trim();
+
+            if (!nama || !nomor) {
+                alert("Mohon isi Nama Lengkap dan Nomor Peserta terlebih dahulu!");
+                return;
+            }
+
+            peserta.nama = nama;
+            peserta.nomor = nomor;
+
+            document.getElementById('info-peserta').innerText = `${nama} (${nomor})`;
+            document.getElementById('halaman-login').classList.add('hidden');
+            document.getElementById('halaman-ujian').classList.remove('hidden');
+
+            loadSoal();
+            mulaiTimer();
+        }
+
+        function mulaiTimer() {
+            const timerDisplay = document.getElementById('timer');
+            
+            intervalTimer = setInterval(() => {
+                let menit = Math.floor(waktuSisa / 60);
+                let detik = waktuSisa % 60;
+
+                timerDisplay.innerText = 
+                    (menit < 10 ? "0" + menit : menit) + ":" + 
+                    (detik < 10 ? "0" + detik : detik);
+
+                if (waktuSisa <= 0) {
+                    clearInterval(intervalTimer);
+                    alert("Waktu ujian telah habis!");
+                    selesaiUjian();
+                } else {
+                    waktuSisa--;
+                }
+            }, 1000);
+        }
+
+        function initNavigasi() {
+            const navGrid = document.getElementById('nav-grid');
+            navGrid.innerHTML = '';
+            daftarSoal.forEach((item, index) => {
+                let btn = document.createElement('button');
+                btn.innerText = index + 1;
+                let isTerisi = jawabanUser[index] !== undefined;
+                btn.className = `p-2 rounded-lg font-bold text-xs border transition ${
+                    isTerisi 
+                    ? 'bg-indigo-600 text-white border-indigo-600' 
+                    : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
+                }`;
+                btn.onclick = () => {
+                    currentIndex = index;
+                    loadSoal();
+                };
+                navGrid.appendChild(btn);
+            });
+        }
+
+        function loadSoal() {
+            const soal = daftarSoal[currentIndex];
+            document.getElementById('nomor-soal').innerText = `Soal No. ${currentIndex + 1} dari ${daftarSoal.length}`;
+            document.getElementById('kategori-soal').innerText = soal.kategori;
+            document.getElementById('teks-soal').innerText = soal.soal;
+
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            soal.opsi.forEach((opsiText, i) => {
+                let isChecked = jawabanUser[currentIndex] === i ? 'checked' : '';
+                let div = document.createElement('label');
+                div.className = `flex items-start p-3 border rounded-lg cursor-pointer transition ${isChecked ? 'border-indigo-600 bg-indigo-50' : 'border-gray-200 hover:bg-gray-50'}`;
+                div.innerHTML = `
+                    <input type="radio" name="jawaban" value="${i}" ${isChecked} onclick="pilihJawaban(${i})" class="mt-1 mr-3 text-indigo-600 h-4 w-4">
+                    <span class="text-gray-700 font-medium">${String.fromCharCode(65 + i)}. ${opsiText}</span>
+                `;
+                optionsContainer.appendChild(div);
+            });
+            initNavigasi();
+        }
+
+        function pilihJawaban(i) {
+            jawabanUser[currentIndex] = i;
+            initNavigasi();
+        }
+
+        function nextSoal() {
+            if (currentIndex < daftarSoal.length - 1) {
+                currentIndex++;
+                loadSoal();
+            }
+        }
+
+        function prevSoal() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                loadSoal();
+            }
+        }
+
+        function konfirmasiSelesai() {
+            let jumlahTerisi = Object.keys(jawabanUser).length;
+            let jumlahKosong = daftarSoal.length - jumlahTerisi;
+
+            let konfirm = confirm(`Konfirmasi Selesai Ujian Tier 3 - Paket 2:\n- Soal Terjawab: ${jumlahTerisi}\n- Belum Terjawab: ${jumlahKosong}\n\nYakin akhiri sesi sekarang?`);
+            if (konfirm) {
+                clearInterval(intervalTimer);
+                selesaiUjian();
+            }
+        }
+
+        function selesaiUjian() {
+            let detikTerpakai = totalWaktuAlokasi - waktuSisa;
+            let menitRil = Math.floor(detikTerpakai / 60);
+            let detikRil = detikTerpakai % 60;
+            let formatWaktuRil = `${menitRil} menit ${detikRil} detik`;
+
+            let totalSkor = 0;
+            daftarSoal.forEach((item, index) => {
+                let ans = jawabanUser[index];
+                if (ans !== undefined) {
+                    if (item.bobot) {
+                        totalSkor += item.bobot[ans];
+                    } else {
+                        if (ans === item.kunci) {
+                            totalSkor += 5; // Bobot TWK/TIU standar
+                        }
+                    }
+                }
+            });
+
+            document.getElementById('halaman-ujian').classList.add('hidden');
+            document.getElementById('halaman-hasil').classList.remove('hidden');
+
+            document.getElementById('res-nama').innerText = peserta.nama;
+            document.getElementById('res-nomor').innerText = peserta.nomor;
+            document.getElementById('res-skor').innerText = totalSkor;
+            document.getElementById('res-waktu').innerText = formatWaktuRil;
+
+            let statusEl = document.getElementById('res-status');
+
+            if (detikTerpakai <= 1200 && totalSkor >= 130) {
+                statusEl.innerHTML = "<span class='font-bold text-indigo-600'>Tier 3 Elite (Luar Biasa!)</span><br><span class='text-xs text-gray-600'>Penyelesaian 30 soal dengan kecepatan dan akurasi tinggi di level lanjutan. Stamina Anda sudah teruji mantap!</span>";
+            } else if (detikTerpakai <= 1620 && totalSkor >= 115) {
+                statusEl.innerHTML = "<span class='font-bold text-emerald-600'>Tier 3 Solid (Standar Target Aman Tercapai)</span><br><span class='text-xs text-gray-600'>Manajemen waktu dan penguasaan TWK implementatif sudah sangat baik. Pertahankan konsistensi ini!</span>";
+            } else {
+                statusEl.innerHTML = "<span class='font-bold text-amber-600'>Perlu Evaluasi Lanjutan</span><br><span class='text-xs text-gray-600'>Periksa kembali analisis kasus implementasi TWK dan ketepatan hitungan TIU Anda. Ayo tingkatkan lagi!</span>";
+            }
+        }
+    </script>
+</body>
+</html>
