@@ -61,7 +61,7 @@
         .subtitle {
             font-size: 1.2rem;
             color: #94a3b8;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             line-height: 1.6;
         }
 
@@ -69,10 +69,36 @@
             font-size: 1.4rem;
             font-weight: 600;
             color: #34d399;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             padding: 10px;
             border-top: 1px dashed rgba(255, 255, 255, 0.1);
             border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        /* Tombol Mulai Simulasi */
+        .btn-mulai {
+            display: inline-block;
+            background: linear-gradient(90deg, #38bdf8, #818cf8);
+            color: #0f172a;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-decoration: none;
+            padding: 14px 32px;
+            border-radius: 50px;
+            box-shadow: 0 8px 20px rgba(56, 189, 248, 0.3);
+            transition: all 0.3s ease;
+            margin-bottom: 35px;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-mulai:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px rgba(56, 189, 248, 0.5);
+            background: linear-gradient(90deg, #818cf8, #38bdf8);
+        }
+
+        .btn-mulai:active {
+            transform: translateY(-1px);
         }
 
         .footer {
@@ -111,6 +137,7 @@
             h1 { font-size: 2rem; }
             .subtitle { font-size: 1rem; }
             .wishes { font-size: 1.2rem; }
+            .btn-mulai { width: 100%; padding: 14px 20px; }
         }
     </style>
 </head>
@@ -128,6 +155,9 @@
         
         <!-- Harapan / Sukses -->
         <div class="wishes">Semoga Sukses!</div>
+
+        <!-- Tombol Menuju Paket Pertama -->
+        <a href="./simulasitescpns/paket4/" class="btn-mulai">🚀 Mulai Simulasi Pertama</a>
         
         <!-- Tanda Tangan / Footer -->
         <div class="footer">
